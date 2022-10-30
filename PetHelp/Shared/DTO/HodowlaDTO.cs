@@ -8,6 +8,7 @@ namespace PetHelp.Shared.DTO
 {
     public class HodowlaDTO
     {
+        public int Id { get; set; }
         public string Nazwa { get; set; }
         public string UserID { get; set; }
     }

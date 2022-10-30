@@ -13,10 +13,10 @@
 <div class="wrapper">
     <div class="items-container" style="height:inherit;  overflow-y:scroll;"> 
         <div class="p-4" style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: stretch;">
-            @foreach (var item in Hodowle)
+            @foreach (HodowlaDTO item in Hodowle)
             {
                 <div class="">
-                    <a class="card shadow m-2 p-2 cardContainer" style="height:100px; width:175px; text-decoration: none;" href = "Panel">
+                    <a class="card shadow m-2 p-2 cardContainer" style="height:100px; width:175px; text-decoration: none;" href="Panel/@(item.Id)">
                         <div class="m-auto text-clipped">
                             @item.Nazwa
                         </div>
@@ -82,7 +82,6 @@
             <div class="input-group gap-2">
                 <input type="text" class="form-control" @bind="@NazwaHodowlil" placeholder="nazwa twojej hodowli"/>
                 <input type="button" class="rectangle-gradient" @onclick="@DodajH" value="Stwórz"/>
-                <input type="button" class="rectangle-gradient" @onclick="async ()=>{ await HideModal(NewHodowlaModal);}" value="closeModal"/>
             </div>
           </div>
         </div>
@@ -136,20 +135,20 @@
             return;
         }
 
-        var body = new HodowlaDTO()
+        HodowlaRequestDTO body = new()
         {
             Nazwa = NazwaHodowlil,
             UserID = CurrentUserId
         };
-        
-        var respond = await KlientHTTP.PostAsJsonAsync<HodowlaDTO>($"Home/Dodajhodowle",body);
-        
+
+        var respond = await KlientHTTP.PostAsJsonAsync<HodowlaRequestDTO>($"Home/Dodajhodowle",body);
+
         if(respond.IsSuccessStatusCode == false)
         {
             // Błąd odpowiedzi ze ztrony serwera
             return;
         }
-        
+
         HodowlaDTO? result = await respond.Content.ReadFromJsonAsync<HodowlaDTO>();
 
         if (result == null) 
@@ -159,6 +158,8 @@
         }
 
         Hodowle.Add(result);
+
+        await HideModal(this.NewHodowlaModal);
     }
     private async Task HideModal(ElementReference modal)
     {

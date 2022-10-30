@@ -14,5 +14,8 @@ namespace PetHelp.Server.Data
         {
         }
         public DbSet<Hodowla> ListaHodowli { get; set; }
+        public DbSet<Zwierze> Zwierzeta { get; set; }
+        public DbSet<Zalacznik> Zalaczniks { get; set; }
+
     }
 }
