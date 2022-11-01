@@ -26,11 +26,15 @@
     border: 1px solid transparent;
     border-radius: 10% 10%;
     color: rgba(205,0,236,1);
+    transition: transform 0.5s ease-out;
 }
 
     .rectangle-gradient:hover {
         background: linear-gradient(rgba(205,0,236,1), rgba(238,124,255,1)) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
         border: 1px solid transparent;
+        font-weight: bolder;
+        transition: transform 0.25s ease-in;
+        -webkit-transform: scale(1.04);
         color: white;
     }
 
@@ -96,4 +100,10 @@
     display: flex;
     justify-content: space-between;
     flex-direction: row;
+}
+
+.selected {
+    border: 3px solid rgba(205,0,236,0.5) !important;
+    border-radius: 15px;
+    font-weight: bolder;
 }

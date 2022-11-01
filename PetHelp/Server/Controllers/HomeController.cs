@@ -12,22 +12,22 @@ public class HomeController : ControllerBase
     private readonly IHodowlaRepositor HodowlaRepo;
     private readonly IZwierzeRepository _zwierzeRepo;
 
-	public HomeController(IHodowlaRepositor hodowlaRepo, IZwierzeRepository zwierzeRepo)
-	{
-		HodowlaRepo = hodowlaRepo;
-		_zwierzeRepo = zwierzeRepo;
-	}
+    public HomeController(IHodowlaRepositor hodowlaRepo, IZwierzeRepository zwierzeRepo)
+    {
+        HodowlaRepo = hodowlaRepo;
+        _zwierzeRepo = zwierzeRepo;
+    }
 
-	[HttpGet("GetUserHodowla/{ID}")]
-    public List<HodowlaDTO>GetUserHodowla(string ID)
+    [HttpGet("GetUserHodowla/{ID}")]
+    public List<HodowlaDTO> GetUserHodowla(string ID)
     {
         var x = HodowlaRepo.GetListaHodowli(ID);
-        return x.Select(Hodowla => new HodowlaDTO() 
+        return x.Select(Hodowla => new HodowlaDTO()
         {
             Id = Hodowla.id,
-            Nazwa = Hodowla.Nazwa 
+            Nazwa = Hodowla.Nazwa
         })
-		.ToList();
+        .ToList();
     }
 
     [HttpPost("Dodajhodowle")]
@@ -48,16 +48,17 @@ public class HomeController : ControllerBase
     [HttpGet("GetZwierzetaByHodowla/{hodowlaId}")]
     public List<ZwierzeDTO> SimplifiedListByHodowla(int hodowlaId)
     {
-        List<Zwierze> zwierzeta = _zwierzeRepo.GetByHodowla(hodowlaId, includeAttachment:false);
-        return zwierzeta.Select(z => 
-            new ZwierzeDTO() 
-            { 
+        List<Zwierze> zwierzeta = _zwierzeRepo.GetByHodowla(hodowlaId, includeAttachment: false);
+        return zwierzeta.Select(z =>
+            new ZwierzeDTO()
+            {
                 Gatunek = z.Gatunek,
-                Imie= z.Imie,
+                Imie = z.Imie,
                 Rasa = z.Rasa,
-                DataUrodzenia = z.DataUrodzenia
+                DataUrodzenia = z.DataUrodzenia,
+                DataDodania = z.DataDodania
             }
         ).ToList();
     }
 }
-    
+

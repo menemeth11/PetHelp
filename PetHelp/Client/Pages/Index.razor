@@ -1,23 +1,28 @@
 ﻿@inject HttpClient KlientHTTP
 @attribute [Authorize]
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
-
-@using Microsoft.JSInterop
-@inject IJSRuntime JS
+@inject StateManager _state;
 
 @page "/"
+@page "/Home"
+
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+@using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Authorization
+@using PetHelp.Client.Nowy_folder
 @using PetHelp.Shared.DTO
 
 <PageTitle>Index</PageTitle>
 <div class="row w-100 m-0">
     <div class="col-12 col-md-6 wrapper p-0">
         <div class="items-container" style="height:inherit;  overflow-y:scroll;">
-            <div class="p-4" style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: stretch;">
+            <div class="p-4" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center;">
                 @foreach (HodowlaDTO item in Hodowle)
                 {
-                    <div class="">
-                        <a class="card shadow m-2 p-2 cardContainer" style="height:100px; width:175px; text-decoration: none;" @onclick="()=>LoadAnimals(item.Id)">
+                    <div>
+                        <a class="card shadow m-2 p-2 cardContainer @(SelectedHodowla==item.Id?"selected":"")" style="height:100px; width:175px; text-decoration: none;" @onclick="()=>LoadAnimals(item.Id)">
                             <div class="m-auto text-clipped">
                                 @item.Nazwa
                             </div>
@@ -93,7 +98,7 @@
         <div class="box-container" @onscroll="CheckBoxes">
             @foreach (var item in Zwierzeta)
             {
-                <div @ref="Boxes[item]" class="slidebox w-100">
+                <div @ref="Boxes[item]" class="slidebox px-3" @onclick="()=>GoToPetDetailsPage(item.Id)">
                     <div class="rectangle-gradient box-row" style="box-shadow:2px 2px 4px rgba(238,130,238,.75)">
                         <div class="mx-3">
                             <span class="oi oi-magnifying-glass" style="font-size:32px;" />
@@ -189,7 +194,7 @@
     private bool IsHovering = false;
     private bool isOpen = false;
     public string HodowlaId { get; set; }
-
+    int SelectedHodowla;
     List<HodowlaDTO> Hodowle = new();
     Dictionary<ZwierzeDTO, ElementReference> Boxes = new();
 
@@ -206,6 +211,8 @@
                 Console.WriteLine($"Failed to load JS module. Error: {ex}");
             }
         }
+
+        await CheckBoxes();
     }
 
     protected override async Task OnInitializedAsync()
@@ -217,6 +224,9 @@
         {
             this.Hodowle = respond;
         }
+
+        this.SelectedHodowla = _state.SelectedHodowlaId;
+        this.Zwierzeta = _state.Zwierzeta;
     }
 
     private async Task DodajH()
@@ -271,6 +281,7 @@
 
     private async Task LoadAnimals(int hodowlaId)
     {
+        this.SelectedHodowla = hodowlaId;
         this.Boxes.Clear(); // wyczyszczenie starcyh bobiektor @ref z pamieci
         var respond = await KlientHTTP.GetFromJsonAsync<List<ZwierzeDTO>>($"Home/GetZwierzetaByHodowla/{hodowlaId}");
         if (respond != null)
@@ -285,6 +296,49 @@
     {
         await module.InvokeVoidAsync("checkBoxes", Boxes.Values);
     }
+
+    private void GoToPetDetailsPage(int petId)
+    {
+        _state.SelectedHodowlaId = this.SelectedHodowla;
+        _state.Zwierzeta = this.Zwierzeta;
+
+        Navigation.NavigateTo($"Panel/{petId}");
+        /*
+        * // Zapisanie aktualnego stanu strony w pamieci ? zeby nie ladowac tego samego ponownie przy powrocie
+        * public class StateManager {
+        *   public int SelectedHodowlaId {get;set;}
+        *   public List<ZwierzeDTO> Zwierzeta {get;set;}
+        * }
+        */
+
+        /*
+        * // zarejestrowanie singletona sluzaczego nam jako pamiec wewnetrzna
+        * builder.Services.AddSingleton<StateManager>();
+        */
+
+        /*
+        * // import singletona na stronie
+        *  @inject StateManager _state;
+        */
+
+        /*
+        * // przy wychodzeniu ze strony, zapisanie w pamieci niebednych danych
+        * _state.SelectedHodowlaId = this.SelectedHodowla;
+        * _state.Zwierzeta = this.Zwierzeta;
+        */
+
+        /*
+        * // przy ładowaniu strony, importujemy stan z stateManagera w OnInitialized tzn na starcie ladowania sie strony
+        * this.SelectedHodowla = _state.SelectedHodowlaId;
+        * this.Zwierzeta = _state.Zwierzeta;
+        */
+
+    }
+
+
 }
+
+
+
 
 
