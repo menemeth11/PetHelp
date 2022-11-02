@@ -28,6 +28,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<IHodowlaRepositor, HodowlaRepository>();
+builder.Services.AddScoped<IZwierzeRepository, ZwierzeRepository>();
 
 var app = builder.Build();
 

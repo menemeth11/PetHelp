@@ -22,7 +22,7 @@ namespace PetHelp.Server.Respositores
             return context.ListaHodowli.Where(Hodowla => Hodowla.WlascicielID == ID).ToList();
         }
 
-        public Hodowla PostListaHodowli(HodowlaDTO data)
+        public Hodowla PostListaHodowli(HodowlaRequestDTO data)
         {
             Hodowla _hodowla = new Hodowla()
             {

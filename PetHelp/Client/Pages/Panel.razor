@@ -1,10 +1,21 @@
-﻿@page "/panel"
+﻿@page "/panel/{ZwierzeId}"
+@using PetHelp.Client.Nowy_folder
+@using PetHelp.Shared.DTO
+@inject HttpClient KlientHTTP
+@inject NavigationManager Navigation
+@inject StateManager _state;
 
-<PageTitle>Panel</PageTitle>
+@inject IJSRuntime JS
 
+<h1>Detale zwierzaka</h1>
 
-<h3>Panel</h3>
+<input type="button" value="Back to list" @onclick="BackToLiat" />
 
 @code {
+    [Parameter] public string ZwierzeId { get; set; }
 
+    private void BackToLiat()
+    {
+        Navigation.NavigateTo("/Home");
+    }
 }

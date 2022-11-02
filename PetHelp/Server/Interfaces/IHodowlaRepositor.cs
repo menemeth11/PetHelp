@@ -7,6 +7,6 @@ namespace PetHelp.Server.Interfaces
     public interface IHodowlaRepositor
     {
         public List<Hodowla> GetListaHodowli(string ID);
-        public Hodowla PostListaHodowli(HodowlaDTO data);
+        public Hodowla PostListaHodowli(HodowlaRequestDTO data);
     }
 }
