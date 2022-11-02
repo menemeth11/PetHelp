@@ -34,4 +34,7 @@ public class Zwierze
     [ForeignKey("Wlasciciel")]
     public string WlascicielId { get; set; }
     public ApplicationUser? Wlasciciel { get; set; }
+    public string Zdjecie_MIME { get; internal set; }
+    public string Zdjecie_Name { get; internal set; }
+    public byte[] Zdjecie_Data { get; internal set; }
 }

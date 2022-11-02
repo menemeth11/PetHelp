@@ -1,4 +1,4 @@
-﻿@page "/panel/{ZwierzeId}"
+﻿@page "/podglad/{ZwierzeId}"
 @using PetHelp.Client.Nowy_folder
 @using PetHelp.Shared.DTO
 @inject HttpClient KlientHTTP
@@ -10,6 +10,7 @@
 <h1>Detale zwierzaka</h1>
 
 <input type="button" value="Back to list" @onclick="BackToLiat" />
+
 
 @code {
     [Parameter] public string ZwierzeId { get; set; }

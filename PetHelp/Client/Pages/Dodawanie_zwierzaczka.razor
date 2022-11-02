@@ -1,0 +1,54 @@
+﻿@page "/dodawanie/{hodowlaID}"
+@using PetHelp.Client.Nowy_folder
+@using PetHelp.Shared.DTO
+@inject HttpClient KlientHTTP
+@inject NavigationManager Navigation
+@inject StateManager _state;
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+
+@inject IJSRuntime JS
+
+<h1>Dodaj zwierzę </h1>
+
+<input type="button" value="Back to list" @onclick="BackToLiat" />
+Gatunek: <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek"/> <br />
+Rasa: <input type="text" @bind="nowyzwierzak.Rasa"/><br />
+Imie: <input type="text" @bind="nowyzwierzak.Imie"/><br />
+Umaszczenie: <input type="text" @bind="nowyzwierzak.Umaszczenie"/><br />
+Data pomiaru waga: <input type="date" @bind="nowyzwierzak.Waga_Pomiar"/><br />
+Waga: <input type="number" @bind="nowyzwierzak.Waga_Wartosc"/><br />
+Data urodzenia: <input type="date" @bind="nowyzwierzak.DataUrodzenia"/><br />
+Kastracja: <input type="checkbox" @bind="nowyzwierzak.Kastracja"/><br />
+Info Dodatkowe: <input type="text" @bind="nowyzwierzak.Info_Dodatkowe"/><br />
+Info Choroby: <input type="text" @bind="nowyzwierzak.Info_Choroby" /><br />
+Info Schorzenia: <input type="text" @bind="nowyzwierzak.Info_Schorzenia" /><br />
+Szczepienie Wscieklizna Data: <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Data"/><br />
+Szczepienie Wscieklizna Status: <input type="checkbox" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Status"/><br />
+Szczepienie Wscieklizna NastepnyTermin: <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_NastepnyTermin"/><br />
+
+<input type="button" value="test" @onclick="test"/>
+
+
+@code {
+    [Parameter] public string hodowlaID { get; set; }
+    private void BackToLiat()
+    {
+        Navigation.NavigateTo("/Home");
+    }
+
+    public ZwierzeDTO nowyzwierzak { get; set; } = new();
+
+    public async Task test(){
+        nowyzwierzak.WlascicielId = CurrentUserId;
+        nowyzwierzak.HodowlaId = Convert.ToInt32(hodowlaID);
+        var respond = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO>($"Home/DodajZwierze", nowyzwierzak);
+    }
+
+    public string CurrentUserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        this.CurrentUserId = authstate.User.Claims.First(x => x.Type == "sub").Value;
+    }
+}
