@@ -10,13 +10,49 @@
 <h1>Detale zwierzaka</h1>
 
 <input type="button" value="Back to list" @onclick="BackToLiat" />
+Gatunek: <input class="btn btn-primary" type="text" @bind="zwierz.Gatunek"/> <br />
+Rasa: <input type="text" @bind="zwierz.Rasa"/><br />
+Imie: <input type="text" @bind="zwierz.Imie"/><br />
+Umaszczenie: <input type="text" @bind="zwierz.Umaszczenie"/><br />
+Data pomiaru waga: <input type="date" @bind="zwierz.Waga_Pomiar"/><br />
+Waga: <input type="number" @bind="zwierz.Waga_Wartosc"/><br />
+Data urodzenia: <input type="date" @bind="zwierz.DataUrodzenia"/><br />
+Kastracja: <input type="checkbox" @bind="zwierz.Kastracja"/><br />
+Info Dodatkowe: <input type="text" @bind="zwierz.Info_Dodatkowe"/><br />
+Info Choroby: <input type="text" @bind="zwierz.Info_Choroby" /><br />
+Info Schorzenia: <input type="text" @bind="zwierz.Info_Schorzenia" /><br />
 
+Szczepienie Wscieklizna Data: <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data"/><br />
+Szczepienie Wscieklizna Status: <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status"/><br />
+Szczepienie Wscieklizna NastepnyTermin: <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin"/><br />
+
+<input type="button" value="edytuj gnoja" @onclick="Aktualizuj">
 
 @code {
     [Parameter] public string ZwierzeId { get; set; }
+    public ZwierzeDTO zwierz { get; set; } = new ();
 
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await KlientHTTP.GetFromJsonAsync<ZwierzeDTO?>($"Home/GetZwierzakDetails/{ZwierzeId}");
+        if(result != null) // result is not null
+        {
+            zwierz = result;
+        }
+    }
     private void BackToLiat()
     {
         Navigation.NavigateTo("/Home");
+    }
+    private async Task Aktualizuj()
+    {
+
+        var result = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
+
+        var x = _state.Zwierzeta.Where(x => x.Id == zwierz.Id).First();
+        x = zwierz;
+
+
+
     }
 }

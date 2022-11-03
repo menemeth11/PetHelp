@@ -54,6 +54,8 @@ public class HomeController : ControllerBase
         return zwierzeta.Select(z =>
             new ZwierzeDTO()
             {
+                HodowlaId = (int)z.HodowlaId,
+                Id = z.Id,
                 Gatunek = z.Gatunek,
                 Imie = z.Imie,
                 Rasa = z.Rasa,
@@ -63,6 +65,38 @@ public class HomeController : ControllerBase
         ).ToList();
     }
 
+
+    [HttpGet("GetZwierzakDetails/{zwierzakId}")]
+    public ZwierzeDTO GetZwierzakDetails(int zwierzakId)
+    {
+        Zwierze? zwierz = _zwierzeRepo.GetById(zwierzakId);
+        if (zwierz is null) return new();
+
+        return new ZwierzeDTO()
+        {
+            Id = zwierz.Id,
+            Imie = zwierz.Imie,
+            Gatunek = zwierz.Gatunek,
+            Rasa = zwierz.Rasa,
+            Umaszczenie = zwierz.Umaszczenie,
+            DataUrodzenia = zwierz.DataUrodzenia,
+            DataDodania = zwierz.DataDodania,
+            Kastracja = zwierz.Kastracja,
+            Waga_Pomiar = zwierz.Waga_Pomiar,
+            Waga_Wartosc = zwierz.Waga_Wartosc,
+            Info_Dodatkowe = zwierz.Info_Dodatkowe,
+            Info_Schorzenia = zwierz.Info_Schorzenia,
+            Info_Choroby = zwierz.Info_Choroby,
+            Szczepienie_Wscieklizna_Status = zwierz.Szczepienie_Wscieklizna_Status,
+            Szczepienie_Wscieklizna_Data = zwierz.Szczepienie_Wscieklizna_Data,
+            Szczepienie_Wscieklizna_NastepnyTermin = zwierz.Szczepienie_Wscieklizna_NastepnyTermin,
+            HodowlaId = (int)zwierz.HodowlaId,
+            WlascicielId = zwierz.WlascicielId,
+            Zdjecie_MIME = zwierz.Zdjecie_MIME,
+            Zdjecie_Name = zwierz.Zdjecie_Name,
+            Zdjecie_Data = zwierz.Zdjecie_Data,
+        };
+    }
 
     [HttpPost("DodajZwierze")]
     public ZwierzeDTO DodajZwierze(ZwierzeDTO x)
@@ -93,6 +127,12 @@ public class HomeController : ControllerBase
             Zdjecie_Data = zwierze.Zdjecie_Data,
 
         };
+    }
+
+    [HttpPost("AktualizujZwierze")]
+    public void AktualizujZwierze(ZwierzeDTO x)
+    {
+        _zwierzeRepo.AktualizujZwierze(x);
     }
 }
 

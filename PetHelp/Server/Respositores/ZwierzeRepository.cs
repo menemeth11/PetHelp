@@ -5,6 +5,7 @@ using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
 using PetHelp.Shared.DTO;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace PetHelp.Server.Respositores;
 
@@ -67,4 +68,44 @@ public class ZwierzeRepository : IZwierzeRepository
         return zwierze;
     }
 
+    public Zwierze? GetById(int zwierzakId)
+    {
+        return context.Zwierzeta
+            .Where(x => x.Id == zwierzakId).Include(x => x.Zdjecie)
+            .FirstOrDefault();
+
+        /*
+         * Select Top 1 * from Zwierzeta _zwierz
+         * Join Zalaczniki _zalacznik 
+         *  on _zalacznik.ZwierzeId = _zwierz.Id
+         * Where _zwierz.Id = {zwierzakId}
+         */
+    }
+
+    public void AktualizujZwierze(ZwierzeDTO edited)
+    {
+        if (edited is null) return;
+
+        Zwierze? orginal = context.Zwierzeta.Find(edited.Id);
+
+        if(orginal is null) return;
+
+        orginal.Imie = edited.Imie;
+        orginal.Gatunek = edited.Gatunek;
+        orginal.Rasa = edited.Rasa;
+        orginal.Umaszczenie = edited.Umaszczenie;
+        orginal.DataUrodzenia = edited.DataUrodzenia;
+        orginal.Kastracja = edited.Kastracja;
+        orginal.Waga_Wartosc = edited.Waga_Wartosc;
+        orginal.Info_Dodatkowe = edited.Info_Dodatkowe;
+        orginal.Info_Schorzenia = edited.Info_Schorzenia;
+        orginal.Info_Choroby = edited.Info_Choroby;
+        orginal.Szczepienie_Wscieklizna_Status = edited.Szczepienie_Wscieklizna_Status;
+        orginal.Szczepienie_Wscieklizna_Data = edited.Szczepienie_Wscieklizna_Data;
+        orginal.Szczepienie_Wscieklizna_NastepnyTermin = edited.Szczepienie_Wscieklizna_NastepnyTermin;
+        orginal.Zdjecie_Name = edited.Zdjecie_Name;
+        orginal.Zdjecie_Data = edited.Zdjecie_Data;
+
+        context.SaveChanges();
+    }
 }
