@@ -8,29 +8,109 @@
 
 @inject IJSRuntime JS
 
-<h1>Dodaj zwierzę </h1>
+    <div class="box">
+        <div class="row header">
+            <div class="backButton" style="background-color:blue;">
+                <input type="button" value="Back to list" @onclick="BackToLiat" />
+            </div>
+        </div>
+        <div class="row content">
+            <div class="" style="width:33.33%; background-color:green;  ">
+                <span> IMAGE </span>
+                <span> Zdjęcie zwierzęcia </span>
+            </div>
+            <div class="" style="width:33.33%; background-color:red; ">
+                Gatunek:
+                <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek" />
 
-<input type="button" value="Back to list" @onclick="BackToLiat" />
-Gatunek: <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek"/> <br />
-Rasa: <input type="text" @bind="nowyzwierzak.Rasa"/><br />
-Imie: <input type="text" @bind="nowyzwierzak.Imie"/><br />
-Umaszczenie: <input type="text" @bind="nowyzwierzak.Umaszczenie"/><br />
-Data pomiaru waga: <input type="date" @bind="nowyzwierzak.Waga_Pomiar"/><br />
-Waga: <input type="number" @bind="nowyzwierzak.Waga_Wartosc"/><br />
-Data urodzenia: <input type="date" @bind="nowyzwierzak.DataUrodzenia"/><br />
-Kastracja: <input type="checkbox" @bind="nowyzwierzak.Kastracja"/><br />
-Info Dodatkowe: <input type="text" @bind="nowyzwierzak.Info_Dodatkowe"/><br />
-Info Choroby: <input type="text" @bind="nowyzwierzak.Info_Choroby" /><br />
-Info Schorzenia: <input type="text" @bind="nowyzwierzak.Info_Schorzenia" /><br />
-Szczepienie Wscieklizna Data: <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Data"/><br />
-Szczepienie Wscieklizna Status: <input type="checkbox" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Status"/><br />
-Szczepienie Wscieklizna NastepnyTermin: <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_NastepnyTermin"/><br />
+                Rasa:
+                <input type="text" @bind="nowyzwierzak.Rasa" />
 
-<input type="button" value="test" @onclick="test"/>
+                Imie:
+                <input type="text" @bind="nowyzwierzak.Imie" />
+
+                Umaszczenie:
+                <input type="text" @bind="nowyzwierzak.Umaszczenie" />
+
+                Data pomiaru waga:
+                <input type="date" @bind="nowyzwierzak.Waga_Pomiar" />
+
+                Waga:
+                <input type="number" @bind="nowyzwierzak.Waga_Wartosc" />
+
+                Data urodzenia:
+                <input type="date" @bind="nowyzwierzak.DataUrodzenia" />
+
+                Kastracja:
+                <input type="checkbox" @bind="nowyzwierzak.Kastracja" />
+
+                Info Dodatkowe:
+                <input type="text" @bind="nowyzwierzak.Info_Dodatkowe" />
+
+                Info Choroby:
+                <input type="text" @bind="nowyzwierzak.Info_Choroby" />
+
+                Info Schorzenia:
+                <input type="text" @bind="nowyzwierzak.Info_Schorzenia" />
+
+                Szczepienie Wscieklizna Data:
+                <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Data" />
+
+                Szczepienie Wscieklizna Status:
+                <input type="checkbox" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Status" />
+
+                Szczepienie Wscieklizna NastepnyTermin:
+                <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_NastepnyTermin" />
+
+            </div>
+            <div class="" style="width:33.33%; background-color:green;  ">
+                <span> IMAGE </span>
+                <span> Zdjęcie zwierzęcia </span>
+            </div>
+        </div>
+        <div class="row footer">
+            <div class="backButton" style="background-color:blue; padding:5px;">
+                <input class="confirmButton" type="button" value="Dodaj" @onclick="test" />
+            </div>
+        </div>
+    </div>
+
+<style>
+    .box {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+    }
+
+        .box .row {
+            border: 1px dotted grey;
+        }
+
+            .box .row.header {
+                flex: 0 1 auto;
+                /* The above is shorthand for:
+                          flex-grow: 0,
+                          flex-shrink: 1,
+                          flex-basis: auto
+                          */
+            }
+
+            .box .row.content {
+                flex: 1 1 auto;
+            }
+
+            .box .row.footer {
+                flex: 0 1 40px;
+            }
+</style>
+
+
+
 
 
 @code {
     [Parameter] public string hodowlaID { get; set; }
+
     private void BackToLiat()
     {
         Navigation.NavigateTo("/Home");
@@ -38,7 +118,8 @@ Szczepienie Wscieklizna NastepnyTermin: <input type="date" @bind="nowyzwierzak.S
 
     public ZwierzeDTO nowyzwierzak { get; set; } = new();
 
-    public async Task test(){
+    public async Task test()
+    {
         nowyzwierzak.WlascicielId = CurrentUserId;
         nowyzwierzak.HodowlaId = Convert.ToInt32(hodowlaID);
         var respond = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO>($"Home/DodajZwierze", nowyzwierzak);

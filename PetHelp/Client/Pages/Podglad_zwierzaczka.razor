@@ -1,6 +1,8 @@
 ﻿@page "/podglad/{ZwierzeId}"
+@using Newtonsoft.Json
 @using PetHelp.Client.Nowy_folder
 @using PetHelp.Shared.DTO
+@using System.Text.Json
 @inject HttpClient KlientHTTP
 @inject NavigationManager Navigation
 @inject StateManager _state;
@@ -10,49 +12,111 @@
 <h1>Detale zwierzaka</h1>
 
 <input type="button" value="Back to list" @onclick="BackToLiat" />
-Gatunek: <input class="btn btn-primary" type="text" @bind="zwierz.Gatunek"/> <br />
-Rasa: <input type="text" @bind="zwierz.Rasa"/><br />
-Imie: <input type="text" @bind="zwierz.Imie"/><br />
-Umaszczenie: <input type="text" @bind="zwierz.Umaszczenie"/><br />
-Data pomiaru waga: <input type="date" @bind="zwierz.Waga_Pomiar"/><br />
-Waga: <input type="number" @bind="zwierz.Waga_Wartosc"/><br />
-Data urodzenia: <input type="date" @bind="zwierz.DataUrodzenia"/><br />
-Kastracja: <input type="checkbox" @bind="zwierz.Kastracja"/><br />
-Info Dodatkowe: <input type="text" @bind="zwierz.Info_Dodatkowe"/><br />
-Info Choroby: <input type="text" @bind="zwierz.Info_Choroby" /><br />
-Info Schorzenia: <input type="text" @bind="zwierz.Info_Schorzenia" /><br />
+Gatunek:
+<input class="btn btn-primary" type="text" @bind="zwierz.Gatunek" />
+<br />
+Rasa:
+<input type="text" @bind="zwierz.Rasa" />
+<br />
+Imie:
+<input type="text" @bind="zwierz.Imie" />
+<br />
+Umaszczenie:
+<input type="text" @bind="zwierz.Umaszczenie" />
+<br />
+Data pomiaru waga:
+<input type="date" @bind="zwierz.Waga_Pomiar" />
+<br />
+Waga:
+<input type="number" @bind="zwierz.Waga_Wartosc" />
+<br />
+Data urodzenia:
+<input type="date" @bind="zwierz.DataUrodzenia" />
+<br />
+Kastracja:
+<input type="checkbox" @bind="zwierz.Kastracja" />
+<br />
+Info Dodatkowe:
+<input type="text" @bind="zwierz.Info_Dodatkowe" />
+<br />
+Info Choroby:
+<input type="text" @bind="zwierz.Info_Choroby" />
+<br />
+Info Schorzenia:
+<input type="text" @bind="zwierz.Info_Schorzenia" />
+<br />
 
-Szczepienie Wscieklizna Data: <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data"/><br />
-Szczepienie Wscieklizna Status: <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status"/><br />
-Szczepienie Wscieklizna NastepnyTermin: <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin"/><br />
+Szczepienie Wscieklizna Data:
+<input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
+<br />
+Szczepienie Wscieklizna Status:
+<input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
+<br />
+Szczepienie Wscieklizna NastepnyTermin:
+<input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
+<br />
 
 <input type="button" value="edytuj gnoja" @onclick="Aktualizuj">
+<input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
+
 
 @code {
+    // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
     [Parameter] public string ZwierzeId { get; set; }
-    public ZwierzeDTO zwierz { get; set; } = new ();
-
+    // page loacl property for html binding and use in code
+    private ZwierzeDTO zwierz { get; set; } = new();
+    // property for keep track of current Zwierz state if its changed or no (used in undo-rever button)
+    private bool IsChanged { get; set; } = false;
+    // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
+    private string _source_Json { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        var result = await KlientHTTP.GetFromJsonAsync<ZwierzeDTO?>($"Home/GetZwierzakDetails/{ZwierzeId}");
-        if(result != null) // result is not null
+        // initial api call to our server to obtain ZwierzDTO data existing in database under Key corresponded to ZwierzeId
+        var respond = await KlientHTTP.GetAsync($"Home/GetZwierzakDetails/{ZwierzeId}");
+        // ensure if api call answer with succes code ( 200 OK )
+        if (respond.IsSuccessStatusCode)
         {
-            zwierz = result;
+            // store fetched full ZwierzDTO data into local property allows to render data inside html section
+            zwierz = await respond.Content.ReadFromJsonAsync<ZwierzeDTO?>() ?? new();
+            // store this respond in page local variableits allow us to fetch fresh 'unchaged' data
+            // whenever its needed for example for reverting changes / undo button
+            this._source_Json = await respond.Content.ReadAsStringAsync();
         }
     }
     private void BackToLiat()
     {
+        // check if any changes occurs in this page
+        if (IsChanged)
+        {
+            // find what index (if object exist, otherwise '-1') have current edited zwierzeDTO in cached list
+            int index = _state.Zwierzeta.FindIndex(x => x.Id == zwierz.Id);
+            //check if index (cached object type ZwierzDTO) exist in memory
+            if (index > 0)
+            {
+                // overrite cached value with new edited one, its allow smooth rerender data
+                //  and display info when use back to main page with his animals list,
+                //  no additional page reload deeded
+                _state.Zwierzeta[index] = zwierz;
+            }
+        }
+
+        // back to main page 'home'
         Navigation.NavigateTo("/Home");
     }
     private async Task Aktualizuj()
     {
-
+        // update zwierz data in database trough Post api call with updated data in body section
+        await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
+        // data is changed, api is called, changed page state 'is changed' to true ( its turn ON undo button )
+        IsChanged = true;
+    }
+    private async Task UndoChanges()
+    {
+        // deserialize orginal (unchanged) element and assign it again to page zwierz property
+        this.zwierz = JsonConvert.DeserializeObject<ZwierzeDTO?>(_source_Json) ?? new();
+        // send to server old version to revert changes
         var result = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
-
-        var x = _state.Zwierzeta.Where(x => x.Id == zwierz.Id).First();
-        x = zwierz;
-
-
-
+        // change this page state 'is changed' to false, data back to orginal from before any modifications
+        IsChanged = false;
     }
 }
