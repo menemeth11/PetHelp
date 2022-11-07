@@ -1,135 +1,206 @@
 ﻿@page "/dodawanie/{hodowlaID}"
 @using PetHelp.Client.Nowy_folder
-@using PetHelp.Shared.DTO
-@inject HttpClient KlientHTTP
-@inject NavigationManager Navigation
-@inject StateManager _state;
-@inject AuthenticationStateProvider GetAuthenticationStateAsync
 
-@inject IJSRuntime JS
+@inject IJSRuntime JS;
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject NavigationManager Navigation;
+@inject HttpClient KlientHTTP;
+@inject StateManager _state;
+
+
+<div class="wrapper">
 
     <div class="box">
-        <div class="row header">
-            <div class="backButton" style="background-color:blue;">
-                <input type="button" value="Back to list" @onclick="BackToLiat" />
+        <div class="wiersz header">
+            <div class="d-flex justify-content-between">
+                <div class="left">
+                    <input class="rectangle-gradient" type="button" value="Back to list" @onclick="BackToLiat" />
+                </div>
+                <div class="center" style="display:flex; align-items: center;justify-content: center;">
+                    <span style="color:red; font-weight:bold;">
+                        Dodawanie nowego zwierzaka
+                    </span>
+                </div>
+                <div class="right text-end"></div>
             </div>
         </div>
-        <div class="row content">
-            <div class="" style="width:33.33%; background-color:green;  ">
-                <span> IMAGE </span>
-                <span> Zdjęcie zwierzęcia </span>
-            </div>
-            <div class="" style="width:33.33%; background-color:red; ">
-                Gatunek:
-                <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek" />
+        <div class="wiersz content">
+            <div class="row m-0 p-0 h-100">
+                <div class="col-3">
+                    <div class="text-center">
+                        <img class="img img-fluid shadow"
+                             src="data:image /jpeg;base64,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 ="
+                             style="border: 2px solid purple; border-radius:15px; width:75%; margin:1rem 0;" />
+                        <p>Zdjęcie psiaka</p>
+                    </div>
+                </div>
+                <div class="col-12 col-lg" style="display: flex; flex-flow: column; height: 100%;">
+                    <!--#region 'Dane podstawowe' -->
+                    <div class="customTable fit">
+                        <div class="title">
+                            <div style="margin-top:auto; margin-bottom:auto;">
+                                Dane podstawowe
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="row2">
+                                <div class="header">Gatunek</div>
+                                <div class="body">
+                                    <input type="text" @bind="@zwierz.Gatunek" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Rasa</div>
+                                <div class="body">
+                                    <input type="text" @bind="@zwierz.Rasa" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Imie</div>
+                                <div class="body">
+                                    <input type="text" @bind="@zwierz.Imie" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Umaszczenie</div>
+                                <div class="body">
+                                    <input type="text" @bind="@zwierz.Umaszczenie" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Waga</div>
+                                <div class="body">
+                                    <div class="col" style="display:flex; flex-direction:column; border-right:2px solid white;">
+                                        <div style="border-bottom:1px solid white;">
+                                            Data pomiaru
+                                        </div>
+                                        <div>
+                                            <input type="date" @bind="@zwierz.Waga_Pomiar" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    <input type="number" min="0" step="0.1" @bind="zwierz.Waga_Wartosc" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Wiek</div>
+                                <div class="body">
+                                    <div class="col" style="display:flex; flex-direction:column; border-right:2px solid white;">
+                                        <div style="border-bottom:1px solid white;">
+                                            Data urodzenia
+                                        </div>
+                                        <div>
+                                            <input type="date" @bind="@zwierz.DataUrodzenia" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    @Utils.GetFormattedAgeString(zwierz.DataUrodzenia)
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Kastracja</div>
+                                <div class="body">
+                                    <input type="checkbox" @bind="@zwierz.Kastracja" />
+                                </div>
+                            </div>
+                        </div>
 
-                Rasa:
-                <input type="text" @bind="nowyzwierzak.Rasa" />
+                    </div>
+                    <!--#endregion 'Dane podstawowe' -->
+                    <div class="w-100; mt-2">
+                        @*separator*@
+                    </div>
+                    <!--#region 'Informacje dodatkowe' -->
+                    <div class="customTable">
+                        <div class="title">
+                            Info Dodatkowe
+                        </div>
+                        <div class="content">
+                            <div class="row2 wide h-100">
+                                <textarea style="width:100%; resize:none;" @bind="zwierz.Info_Dodatkowe" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--#endregion 'Informacje dodatkowe' -->
+                </div>
+                <div class="col-12 col-lg" style="display: flex; flex-flow: column; height: 100%;">
+                    <!--#region 'Dane chorobowe' -->
+                    <div class="customTable">
+                        <div class="title">
+                            Dane chorobowe
+                        </div>
+                        <div class="content">
 
-                Imie:
-                <input type="text" @bind="nowyzwierzak.Imie" />
+                            <div class="customTable inner">
+                                <div class="title wide">
+                                    Aktualne schorzenia
+                                </div>
+                                <div class="row2 wide">
+                                    <textarea style="width:100%; resize:none;" @bind="zwierz.Info_Schorzenia" />
+                                </div>
+                            </div>
 
-                Umaszczenie:
-                <input type="text" @bind="nowyzwierzak.Umaszczenie" />
+                            <div class="customTable inner">
+                                <div class="title">
+                                    Przebyte choroby
+                                </div>
+                                <div class="row2 wide">
+                                    <textarea style="width:100%; resize:none;" @bind="zwierz.Info_Choroby" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--#endregion 'Dane chorobowe' -->
+                    <div class="w-100; mt-2">
+                        @*separator*@
+                    </div>
+                    <!--#region 'szczepienie porzeciw wsciekliznie' -->
+                    <div class="customTable fit">
+                        <div class="title">
+                            <div style="margin-top:auto; margin-bottom:auto;">
+                                Szczepienie przeciw wściekliźnie
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="row2">
+                                <div class="header wide">Data ostatnmiego szczepienia</div>
+                                <div class="body">
 
-                Data pomiaru waga:
-                <input type="date" @bind="nowyzwierzak.Waga_Pomiar" />
+                                    <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
 
-                Waga:
-                <input type="number" @bind="nowyzwierzak.Waga_Wartosc" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header wide">Czy odbyto</div>
+                                <div class="body">
 
-                Data urodzenia:
-                <input type="date" @bind="nowyzwierzak.DataUrodzenia" />
+                                    <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
 
-                Kastracja:
-                <input type="checkbox" @bind="nowyzwierzak.Kastracja" />
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header wide">
+                                    Data następnego szczepienia
+                                </div>
+                                <div class="body">
 
-                Info Dodatkowe:
-                <input type="text" @bind="nowyzwierzak.Info_Dodatkowe" />
+                                    <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
 
-                Info Choroby:
-                <input type="text" @bind="nowyzwierzak.Info_Choroby" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--#endregion 'szczepienie porzeciw wsciekliznie' -->
+                    <div>
+                    </div>
+                </div>
 
-                Info Schorzenia:
-                <input type="text" @bind="nowyzwierzak.Info_Schorzenia" />
-
-                Szczepienie Wscieklizna Data:
-                <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Data" />
-
-                Szczepienie Wscieklizna Status:
-                <input type="checkbox" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Status" />
-
-                Szczepienie Wscieklizna NastepnyTermin:
-                <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_NastepnyTermin" />
-
-            </div>
-            <div class="" style="width:33.33%; background-color:green;  ">
-                <span> IMAGE </span>
-                <span> Zdjęcie zwierzęcia </span>
             </div>
         </div>
-        <div class="row footer">
-            <div class="backButton" style="background-color:blue; padding:5px;">
-                <input class="confirmButton" type="button" value="Dodaj" @onclick="test" />
-            </div>
+        <div class="wiersz footer text-center">
+            <input class="rectangle-gradient" type="button" value="Dodaj" @onclick="CreateNew">
         </div>
     </div>
-
-<style>
-    .box {
-        display: flex;
-        flex-flow: column;
-        height: 100%;
-    }
-
-        .box .row {
-            border: 1px dotted grey;
-        }
-
-            .box .row.header {
-                flex: 0 1 auto;
-                /* The above is shorthand for:
-                          flex-grow: 0,
-                          flex-shrink: 1,
-                          flex-basis: auto
-                          */
-            }
-
-            .box .row.content {
-                flex: 1 1 auto;
-            }
-
-            .box .row.footer {
-                flex: 0 1 40px;
-            }
-</style>
-
-
-
-
-
-@code {
-    [Parameter] public string hodowlaID { get; set; }
-
-    private void BackToLiat()
-    {
-        Navigation.NavigateTo("/Home");
-    }
-
-    public ZwierzeDTO nowyzwierzak { get; set; } = new();
-
-    public async Task test()
-    {
-        nowyzwierzak.WlascicielId = CurrentUserId;
-        nowyzwierzak.HodowlaId = Convert.ToInt32(hodowlaID);
-        var respond = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO>($"Home/DodajZwierze", nowyzwierzak);
-    }
-
-    public string CurrentUserId { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        this.CurrentUserId = authstate.User.Claims.First(x => x.Type == "sub").Value;
-    }
-}
+</div>

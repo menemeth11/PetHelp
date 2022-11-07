@@ -1,122 +1,375 @@
 ﻿@page "/podglad/{ZwierzeId}"
-@using Newtonsoft.Json
 @using PetHelp.Client.Nowy_folder
-@using PetHelp.Shared.DTO
 @using System.Text.Json
-@inject HttpClient KlientHTTP
-@inject NavigationManager Navigation
+@using System.Net.Http.Headers
+
+@inject IJSRuntime JS;
+@inject NavigationManager Navigation;
+@inject HttpClient KlientHTTP;
 @inject StateManager _state;
 
-@inject IJSRuntime JS
 
-<h1>Detale zwierzaka</h1>
+<div class="wrapper">
 
-<input type="button" value="Back to list" @onclick="BackToLiat" />
-Gatunek:
-<input class="btn btn-primary" type="text" @bind="zwierz.Gatunek" />
-<br />
-Rasa:
-<input type="text" @bind="zwierz.Rasa" />
-<br />
-Imie:
-<input type="text" @bind="zwierz.Imie" />
-<br />
-Umaszczenie:
-<input type="text" @bind="zwierz.Umaszczenie" />
-<br />
-Data pomiaru waga:
-<input type="date" @bind="zwierz.Waga_Pomiar" />
-<br />
-Waga:
-<input type="number" @bind="zwierz.Waga_Wartosc" />
-<br />
-Data urodzenia:
-<input type="date" @bind="zwierz.DataUrodzenia" />
-<br />
-Kastracja:
-<input type="checkbox" @bind="zwierz.Kastracja" />
-<br />
-Info Dodatkowe:
-<input type="text" @bind="zwierz.Info_Dodatkowe" />
-<br />
-Info Choroby:
-<input type="text" @bind="zwierz.Info_Choroby" />
-<br />
-Info Schorzenia:
-<input type="text" @bind="zwierz.Info_Schorzenia" />
-<br />
+    <div class="box">
+        <div class="wiersz header">
+            <div class="d-flex justify-content-between">
+                <div class="left">
+                    <input class="rectangle-gradient" type="button" value="Back to list" @onclick="BackToLiat" />
+                </div>
+                <div class="center" style="display:flex; align-items: center;justify-content: center;">
+                    @if (_EditMode)
+                    {
+                        <span style="color:red; font-weight:bold;">
+                            Włączony tryb edycji
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            Szczegółowe informacje dla <b>@zwierz.Imie</b>
+                        </span>
+                    }
+                </div>
+                <div class="right text-end">
+                    @if (!_EditMode)
+                    {
+                        <input class="rectangle-gradient" type="button" value="Edit" @onclick="SwitchEditModel" />
+                    }
+                    else
+                    {
+                        <input class="rectangle-gradient" type="button" value="Back" @onclick="SwitchEditModel" />
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="wiersz content">
+            <div class="row m-0 p-0 h-100">
+                <div class="col-3">
+                    <div class="text-center">
+                        <div class="avatar-holder">
+                            <img class="img img-fluid avatar-main shadow @(_EditMode?"imgHoverUpload":"")" src="@ZwierzeImageUrl"
+                                 @onclick="HandleClick" @onmouseout="@OnMouseOut" @onmouseover="@OnMouseOver" />
+                            @if (_IsHovering && _EditMode)
+                            {
+                                <img class="upload-image" src="/add_photo_alternate_sharp.svg" alt="upload image" />
+                            }
+                        </div>
 
-Szczepienie Wscieklizna Data:
-<input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
-<br />
-Szczepienie Wscieklizna Status:
-<input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
-<br />
-Szczepienie Wscieklizna NastepnyTermin:
-<input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
-<br />
 
-<input type="button" value="edytuj gnoja" @onclick="Aktualizuj">
-<input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
+                        @code {
+                            bool _IsHovering = false;
+
+                            protected void OnMouseOver(MouseEventArgs mouseEvent)
+                            {
+                                if (!_IsHovering)
+                                {
+                                    _IsHovering = true;
+                                    StateHasChanged();
+                                }
+                            }
+
+                            protected void OnMouseOut(MouseEventArgs mouseEvent)
+                            {
+                                _IsHovering = false;
+                                StateHasChanged();
+                            }
+                        }
+                        @if (_EditMode)
+                        {
+                            <InputFile id="uploadBtn1" OnChange="@OnInputFileChange" style="display:none;" />
+                        }
+
+                        <p>Zdjęcie psiaka</p>
+                    </div>
+                </div>
+                <div class="col-12 col-lg" style="display: flex; flex-flow: column; height: 100%;">
+                    <!--#region 'Dane podstawowe' -->
+                    <div class="customTable fit">
+                        <div class="title">
+                            <div style="margin-top:auto; margin-bottom:auto;">
+                                Dane podstawowe
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="row2">
+                                <div class="header">Gatunek</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="text" @bind="@zwierz.Gatunek" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Gatunek
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Rasa</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="text" @bind="@zwierz.Rasa" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Rasa
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Imie</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="text" @bind="@zwierz.Imie" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Imie
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Umaszczenie</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="text" @bind="@zwierz.Umaszczenie" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Umaszczenie
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Waga</div>
+                                <div class="body">
+                                    <div class="col" style="display:flex; flex-direction:column; border-right:2px solid white;">
+                                        <div style="border-bottom:1px solid white;">
+                                            Data pomiaru
+                                        </div>
+                                        <div>
+                                            @if (_EditMode)
+                                            {
+                                                <input type="date" @bind="@zwierz.Waga_Pomiar" />
+                                            }
+                                            else
+                                            {
+                                                @zwierz.Waga_Pomiar?.ToShortDateString()
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="number" min="0" step="0.1" @bind="zwierz.Waga_Wartosc" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Waga_Wartosc <span>kg</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Wiek</div>
+                                <div class="body">
+                                    <div class="col" style="display:flex; flex-direction:column; border-right:2px solid white;">
+                                        <div style="border-bottom:1px solid white;">
+                                            Data urodzenia
+                                        </div>
+                                        <div>
+                                            @if (_EditMode)
+                                            {
+                                                <input type="date" @bind="@zwierz.DataUrodzenia" />
+                                            }
+                                            else
+                                            {
+                                                @zwierz.DataUrodzenia
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="body">
+                                    @Utils.GetFormattedAgeString(zwierz.DataUrodzenia)
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header">Kastracja</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="checkbox" @bind="@zwierz.Kastracja" />
+                                    }
+                                    else
+                                    {
+                                        @(
+                                            zwierz.Kastracja ? "Tak" : "Nie"
+                                            )
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--#endregion 'Dane podstawowe' -->
+                    <div class="w-100; mt-2">
+                        @*separator*@
+                    </div>
+                    <!--#region 'Informacje dodatkowe' -->
+                    <div class="customTable">
+                        <div class="title">
+                            Info Dodatkowe
+                        </div>
+                        <div class="content">
+                            <div class="row2 wide h-100">
+                                <textarea readonly="@(!_EditMode)" style="width:100%; resize:none;" @bind="zwierz.Info_Dodatkowe" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--#endregion 'Informacje dodatkowe' -->
+                </div>
+                <div class="col-12 col-lg" style="display: flex; flex-flow: column; height: 100%;">
+                    <!--#region 'Dane chorobowe' -->
+                    <div class="customTable">
+                        <div class="title">
+                            Dane chorobowe
+                        </div>
+                        <div class="content">
+
+                            <div class="customTable inner">
+                                <div class="title wide">
+                                    Aktualne schorzenia
+                                </div>
+                                <div class="row2 wide">
+                                    <textarea readonly="@(!_EditMode)" style="width:100%; resize:none;" @bind="zwierz.Info_Schorzenia" />
+                                </div>
+                            </div>
+
+                            <div class="customTable inner">
+                                <div class="title">
+                                    Przebyte choroby
+                                </div>
+                                <div class="row2 wide">
+                                    <textarea readonly="@(!_EditMode)" style="width:100%; resize:none;" @bind="zwierz.Info_Choroby" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--#endregion 'Dane chorobowe' -->
+                    <div class="w-100; mt-2">
+                        @*separator*@
+                    </div>
+                    <!--#region 'szczepienie porzeciw wsciekliznie' -->
+                    <div class="customTable fit">
+                        <div class="title">
+                            <div style="margin-top:auto; margin-bottom:auto;">
+                                Szczepienie przeciw wściekliźnie
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="row2">
+                                <div class="header wide">Data ostatnmiego szczepienia</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Szczepienie_Wscieklizna_Data?.ToShortDateString()
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header wide">Czy odbyto</div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
+                                    }
+                                    else
+                                    {
+                                        @(
+                                            zwierz.Szczepienie_Wscieklizna_Status ? "Tak" : "Nie"
+                                            )
+                                    }
+                                </div>
+                            </div>
+                            <div class="row2">
+                                <div class="header wide">
+                                    Data następnego szczepienia
+                                </div>
+                                <div class="body">
+                                    @if (_EditMode)
+                                    {
+                                        <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
+                                    }
+                                    else
+                                    {
+                                        @zwierz.Szczepienie_Wscieklizna_NastepnyTermin?.ToShortDateString()
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--#endregion 'szczepienie porzeciw wsciekliznie' -->
+                    <div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        @if (_EditMode)
+        {
+            <div class="wiersz footer text-center">
+                <input class="rectangle-gradient" type="button" value="zaktualizuj" @onclick="Aktualizuj">
+                <input class="rectangle-gradient" type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
+            </div>
+        }
+    </div>
+</div>
 
 
 @code {
-    // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
-    [Parameter] public string ZwierzeId { get; set; }
-    // page loacl property for html binding and use in code
-    private ZwierzeDTO zwierz { get; set; } = new();
-    // property for keep track of current Zwierz state if its changed or no (used in undo-rever button)
-    private bool IsChanged { get; set; } = false;
-    // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
-    private string _source_Json { get; set; }
-    protected override async Task OnInitializedAsync()
+    string ZwierzeImageUrl
     {
-        // initial api call to our server to obtain ZwierzDTO data existing in database under Key corresponded to ZwierzeId
-        var respond = await KlientHTTP.GetAsync($"Home/GetZwierzakDetails/{ZwierzeId}");
-        // ensure if api call answer with succes code ( 200 OK )
-        if (respond.IsSuccessStatusCode)
+        get
         {
-            // store fetched full ZwierzDTO data into local property allows to render data inside html section
-            zwierz = await respond.Content.ReadFromJsonAsync<ZwierzeDTO?>() ?? new();
-            // store this respond in page local variableits allow us to fetch fresh 'unchaged' data
-            // whenever its needed for example for reverting changes / undo button
-            this._source_Json = await respond.Content.ReadAsStringAsync();
+            if (zwierz.Zdjecie_Data.Length == 0) return "/No-Image-Placeholder.svg.png";
+
+            return $"data:@zwierz.Zdjecie_MIME;base64,{Convert.ToBase64String(zwierz.Zdjecie_Data)}";
         }
     }
-    private void BackToLiat()
+    IJSObjectReference? module { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // check if any changes occurs in this page
-        if (IsChanged)
+        if (firstRender)
         {
-            // find what index (if object exist, otherwise '-1') have current edited zwierzeDTO in cached list
-            int index = _state.Zwierzeta.FindIndex(x => x.Id == zwierz.Id);
-            //check if index (cached object type ZwierzDTO) exist in memory
-            if (index > 0)
+            try
             {
-                // overrite cached value with new edited one, its allow smooth rerender data
-                //  and display info when use back to main page with his animals list,
-                //  no additional page reload deeded
-                _state.Zwierzeta[index] = zwierz;
+                this.module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Podglad_zwierzaczka.razor.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load JS module. Error: {ex}");
             }
         }
+    }
 
-        // back to main page 'home'
-        Navigation.NavigateTo("/Home");
-    }
-    private async Task Aktualizuj()
+    private async void HandleClick()
     {
-        // update zwierz data in database trough Post api call with updated data in body section
-        await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
-        // data is changed, api is called, changed page state 'is changed' to true ( its turn ON undo button )
-        IsChanged = true;
+        if (!_EditMode) return;
+
+        if (module is not null)
+        {
+            await this.module.InvokeVoidAsync("triggerButton", "uploadBtn1");
+            //await this.module.InvokeVoidAsync("triggerButton", UploadImageBtn.Element?.Id);
+        }
     }
-    private async Task UndoChanges()
-    {
-        // deserialize orginal (unchanged) element and assign it again to page zwierz property
-        this.zwierz = JsonConvert.DeserializeObject<ZwierzeDTO?>(_source_Json) ?? new();
-        // send to server old version to revert changes
-        var result = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
-        // change this page state 'is changed' to false, data back to orginal from before any modifications
-        IsChanged = false;
-    }
+
 }

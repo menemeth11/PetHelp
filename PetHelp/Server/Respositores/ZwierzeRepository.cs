@@ -20,18 +20,18 @@ public class ZwierzeRepository : IZwierzeRepository
 
     public List<Zwierze> GetByHodowla(int hodowlaId, bool includeAttachment = true)
     {
-        if(includeAttachment == false)
-		{
+        if (includeAttachment == false)
+        {
             return context.Zwierzeta
                 .AsNoTracking()
                 .Where(x => x.HodowlaId == hodowlaId)
                 .ToList();
-		}
+        }
 
         return context.Zwierzeta
         .AsNoTracking()
         .Where(x => x.HodowlaId == hodowlaId)
-        .Include(x=>x.Zdjecie)
+        .Include(x => x.Zdjecie)
         .ToList();
     }
 
@@ -88,7 +88,7 @@ public class ZwierzeRepository : IZwierzeRepository
 
         Zwierze? orginal = context.Zwierzeta.Find(edited.Id);
 
-        if(orginal is null) return;
+        if (orginal is null) return;
 
         orginal.Imie = edited.Imie;
         orginal.Gatunek = edited.Gatunek;
@@ -105,6 +105,7 @@ public class ZwierzeRepository : IZwierzeRepository
         orginal.Szczepienie_Wscieklizna_NastepnyTermin = edited.Szczepienie_Wscieklizna_NastepnyTermin;
         orginal.Zdjecie_Name = edited.Zdjecie_Name;
         orginal.Zdjecie_Data = edited.Zdjecie_Data;
+        orginal.Zdjecie_MIME = edited.Zdjecie_MIME;
 
         context.SaveChanges();
     }

@@ -120,16 +120,15 @@
             }
         </div>
 
-        @if (SelectedHodowla >0)
+        @if (SelectedHodowla > 0)
         {
             <!--Button trigger modal -->
-        <input type="button" class="round-gradient bottom-right shadow" @onclick="Dodajzwierzaka" value="Dodaj" />
+            <input type="button" class="round-gradient bottom-right shadow" @onclick="Dodajzwierzaka" value="Dodaj" />
         }
     </div>
 </div>
 
 @code {
-    IJSObjectReference? module { get; set; }
 
     ElementReference NewHodowlaModal;
 
@@ -141,6 +140,7 @@
     List<HodowlaDTO> Hodowle = new();
     Dictionary<ZwierzeDTO, ElementReference> Boxes = new();
 
+    IJSObjectReference? module { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -172,7 +172,11 @@
         this.Zwierzeta = _state.Zwierzeta;
     }
 
-    private void Dodajzwierzaka(){
+    private void Dodajzwierzaka()
+    {
+        _state.SelectedHodowlaId = this.SelectedHodowla;
+        _state.Zwierzeta = this.Zwierzeta;
+
         Navigation.NavigateTo($"dodawanie/{SelectedHodowla}");
     }
 
@@ -250,36 +254,6 @@
         _state.Zwierzeta = this.Zwierzeta;
 
         Navigation.NavigateTo($"podglad/{petId}");
-        /*
-        * // Zapisanie aktualnego stanu strony w pamieci ? zeby nie ladowac tego samego ponownie przy powrocie
-        * public class StateManager {
-        *   public int SelectedHodowlaId {get;set;}
-        *   public List<ZwierzeDTO> Zwierzeta {get;set;}
-        * }
-        */
-
-        /*
-        * // zarejestrowanie singletona sluzaczego nam jako pamiec wewnetrzna
-        * builder.Services.AddSingleton<StateManager>();
-        */
-
-        /*
-        * // import singletona na stronie
-        *  @inject StateManager _state;
-        */
-
-        /*
-        * // przy wychodzeniu ze strony, zapisanie w pamieci niebednych danych
-        * _state.SelectedHodowlaId = this.SelectedHodowla;
-        * _state.Zwierzeta = this.Zwierzeta;
-        */
-
-        /*
-        * // przy ładowaniu strony, importujemy stan z stateManagera w OnInitialized tzn na starcie ladowania sie strony
-        * this.SelectedHodowla = _state.SelectedHodowlaId;
-        * this.Zwierzeta = _state.Zwierzeta;
-        */
-
     }
 
 

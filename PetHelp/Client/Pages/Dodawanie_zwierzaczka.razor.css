@@ -20,21 +20,34 @@
     height: 3rem;
     align-items: center;
     background: linear-gradient( white,white) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-    border: 1px solid transparent;
-    border-radius: 10% 10%;
+    border: 2px solid transparent;
+    border-radius: 10px 10px;
     color: rgba(205,0,236,1);
 }
 
     .rectangle-gradient:hover {
         background: linear-gradient(rgba(205,0,236,1), rgba(238,124,255,1)) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-        border: 0px solid transparent;
+        border: 2px solid transparent;
         color: white;
     }
+
+    .rectangle-gradient:disabled {
+        border: 2px solid transparent;
+        color: dimgrey;
+        filter: grayscale();
+    }
+
+        .rectangle-gradient:disabled:hover {
+            border: 2px solid transparent;
+            color: black;
+            filter: grayscale();
+        }
 
 .wrapper {
     height: calc(100vh - 3.5rem);
     width: calc(100vw-250px);
-    /*position: relative;*/
+    position: relative;
+    overflow-y: scroll;
 }
 
 .bottom-right {
@@ -61,4 +74,175 @@
     overflow: hidden;
     width: auto;
     text-overflow: ellipsis;
+}
+/* -------------------------------------------------------------------------------------------------- */
+
+.parent {
+    display: flex;
+}
+
+.left,
+.right {
+    flex: 1;
+}
+/* -------------------------------------------------------------------------------------------------- */
+
+.box {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+    .box .wiersz {
+        border: 1px dotted #0313fc;
+    }
+
+        .box .wiersz.header {
+            flex: 0 1 auto;
+            padding: 0.25rem;
+        }
+
+        .box .wiersz.content {
+            flex: 1 1 auto;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .box .wiersz.footer {
+            flex: 0 1 auto;
+            padding: 0.25rem;
+        }
+/* -------------------------------------------------------------------------------------------------- */
+textarea {
+    height: 100%;
+    padding: 3px 3px;
+    background-color: rgb(230,230,250);
+    font-family: Roboto;
+    font-size: 16px;
+    resize: none;
+    border: 0;
+}
+
+    textarea:read-only {
+        background-color: transparent;
+        color: white;
+    }
+
+        textarea:read-only:focus {
+            outline: none !important;
+            border: 0px;
+        }
+
+
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .col-12 {
+        height: fit-content !important;
+    }
+
+        .col-12:not(:last-child) {
+            margin-bottom: 1rem;
+        }
+}
+
+.customTable {
+    width: 100%;
+    background-color: rgb(32,95,140);
+    /*border: 2px solid purple;*/
+    /*border-radius:10px;*/
+    color: white;
+    height: 100%;
+    flex-direction: column;
+    display: flex;
+    flex-flow: column;
+    flex: 1 1 auto;
+}
+
+    .customTable .content {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        display: flex;
+        flex-flow: column;
+        flex: 1 1 auto;
+    }
+
+    .customTable.fit {
+        /*width: 100%;*/
+        height: fit-content;
+    }
+
+    .customTable .content .row2:not(:last-child) {
+        margin-bottom: 0.5rem;
+    }
+
+    .customTable.inner {
+        border: 1px solid white;
+        border-radius: 0px;
+    }
+
+        .customTable.inner:not(:last-child) {
+            margin-bottom: 0.5rem;
+        }
+
+    .customTable .row2 {
+        border: 1px solid white;
+        background-color: rgb(40,118,174);
+        display: flex;
+        text-align: center;
+    }
+
+        .customTable .row2 .header {
+            width: 40%;
+            background-color: rgb(31,107,163);
+            border-right: 2px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /*background-color: red;*/
+        }
+
+        .customTable .row2 .body {
+            width: 100%;
+            background-color: rgb(40,118,174);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+    .customTable .title {
+        width: 100%;
+        background-color: rgb(40,118,174);
+        font-weight: bold;
+        justify-content: center;
+        text-align: center;
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+    }
+
+.row2 .header.wide {
+    width: fit-content;
+    white-space: nowrap;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+
+.customTable.inner .title {
+    border-bottom: 1px solid white;
+}
+
+.row2.wide {
+    border: none;
+    padding: 0.25rem !important;
+    /*background-color: orange;*/
+    flex: 1 1 auto;
+}
+
+button, input, optgroup, select {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    background-color: rgb(230,230,250);
 }
