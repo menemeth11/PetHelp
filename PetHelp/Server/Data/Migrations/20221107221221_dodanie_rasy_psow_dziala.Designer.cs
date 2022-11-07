@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetHelp.Server.Data;
 
@@ -11,9 +12,10 @@ using PetHelp.Server.Data;
 namespace PetHelp.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221107221221_dodanie_rasy_psow_dziala")]
+    partial class dodanie_rasy_psow_dziala
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -511,7 +513,7 @@ namespace PetHelp.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("rasy_psowId")
+                    b.Property<int>("rasy_psowId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -612,7 +614,9 @@ namespace PetHelp.Server.Data.Migrations
 
                     b.HasOne("PetHelp.Server.Models.rasa_psa", "rasa")
                         .WithMany()
-                        .HasForeignKey("rasy_psowId");
+                        .HasForeignKey("rasy_psowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Hodowla");
 

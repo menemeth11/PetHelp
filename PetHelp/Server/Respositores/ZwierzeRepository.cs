@@ -43,7 +43,6 @@ public class ZwierzeRepository : IZwierzeRepository
             Id = nowe.Id,
             Imie = nowe.Imie,
             Gatunek = nowe.Gatunek,
-            Rasa = nowe.Rasa,
             Umaszczenie = nowe.Umaszczenie,
             DataUrodzenia = nowe.DataUrodzenia,
             DataDodania = nowe.DataDodania,
@@ -61,6 +60,8 @@ public class ZwierzeRepository : IZwierzeRepository
             Zdjecie_MIME = nowe.Zdjecie_MIME,
             Zdjecie_Name = nowe.Zdjecie_Name,
             Zdjecie_Data = nowe.Zdjecie_Data,
+            rasy_psowId = nowe.rasaId,
+            rasa = null,
 
         };
         context.Zwierzeta.Add(zwierze);
@@ -92,7 +93,6 @@ public class ZwierzeRepository : IZwierzeRepository
 
         orginal.Imie = edited.Imie;
         orginal.Gatunek = edited.Gatunek;
-        orginal.Rasa = edited.Rasa;
         orginal.Umaszczenie = edited.Umaszczenie;
         orginal.DataUrodzenia = edited.DataUrodzenia;
         orginal.Kastracja = edited.Kastracja;

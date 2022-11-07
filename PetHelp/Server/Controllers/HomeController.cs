@@ -58,7 +58,6 @@ public class HomeController : ControllerBase
                 Id = z.Id,
                 Gatunek = z.Gatunek,
                 Imie = z.Imie,
-                Rasa = z.Rasa,
                 DataUrodzenia = z.DataUrodzenia,
                 DataDodania = z.DataDodania
             }
@@ -77,7 +76,6 @@ public class HomeController : ControllerBase
             Id = zwierz.Id,
             Imie = zwierz.Imie,
             Gatunek = zwierz.Gatunek,
-            Rasa = zwierz.Rasa,
             Umaszczenie = zwierz.Umaszczenie,
             DataUrodzenia = zwierz.DataUrodzenia,
             DataDodania = zwierz.DataDodania,
@@ -107,7 +105,6 @@ public class HomeController : ControllerBase
             Id = zwierze.Id ,
             Imie= zwierze.Imie,
             Gatunek= zwierze.Gatunek,
-            Rasa = zwierze.Rasa,
             Umaszczenie = zwierze.Umaszczenie,
             DataUrodzenia = zwierze.DataUrodzenia,
             DataDodania = zwierze.DataDodania,
@@ -125,6 +122,7 @@ public class HomeController : ControllerBase
             Zdjecie_MIME = zwierze.Zdjecie_MIME,
             Zdjecie_Name = zwierze.Zdjecie_Name,
             Zdjecie_Data = zwierze.Zdjecie_Data,
+            rasaId = (int)zwierze.rasy_psowId,
 
         };
     }
