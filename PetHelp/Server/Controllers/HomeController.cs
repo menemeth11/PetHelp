@@ -38,6 +38,7 @@ public class HomeController : ControllerBase
         Hodowla hodowla = HodowlaRepo.PostListaHodowli(x);
         return new HodowlaDTO()
         {
+            Id = hodowla.id,
             Nazwa = hodowla.Nazwa
         };
     }
