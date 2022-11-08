@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetHelp.Server.Data;
 
 #nullable disable
 
-namespace PetHelp.Server.Data.Migrations
+namespace PetHelp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221027183255_ListaHodowli")]
-    partial class ListaHodowli
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,6 +388,143 @@ namespace PetHelp.Server.Data.Migrations
                     b.ToTable("ListaHodowli");
                 });
 
+            modelBuilder.Entity("PetHelp.Server.Models.rasa_psa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Nazwa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("rasy_psow");
+                });
+
+            modelBuilder.Entity("PetHelp.Server.Models.Zalacznik", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<byte[]>("Zdjecie_Data")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Zdjecie_MIME")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Zdjecie_Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ZwierzeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZwierzeId")
+                        .IsUnique();
+
+                    b.ToTable("Zalaczniks");
+                });
+
+            modelBuilder.Entity("PetHelp.Server.Models.Zwierze", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DataDodania")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataUrodzenia")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Gatunek")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("HodowlaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Imie")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Info_Choroby")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Info_Dodatkowe")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Info_Schorzenia")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Kastracja")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("Szczepienie_Wscieklizna_Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Szczepienie_Wscieklizna_NastepnyTermin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Szczepienie_Wscieklizna_Status")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Umaszczenie")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Waga_Pomiar")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float?>("Waga_Wartosc")
+                        .HasColumnType("real");
+
+                    b.Property<string>("WlascicielId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("Zdjecie_Data")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Zdjecie_MIME")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Zdjecie_Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("rasy_psowId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HodowlaId");
+
+                    b.HasIndex("WlascicielId");
+
+                    b.HasIndex("rasy_psowId");
+
+                    b.ToTable("Zwierzeta");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -450,6 +585,50 @@ namespace PetHelp.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Wlasciciel");
+                });
+
+            modelBuilder.Entity("PetHelp.Server.Models.Zalacznik", b =>
+                {
+                    b.HasOne("PetHelp.Server.Models.Zwierze", "Zwierze")
+                        .WithOne("Zdjecie")
+                        .HasForeignKey("PetHelp.Server.Models.Zalacznik", "ZwierzeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zwierze");
+                });
+
+            modelBuilder.Entity("PetHelp.Server.Models.Zwierze", b =>
+                {
+                    b.HasOne("PetHelp.Server.Models.Hodowla", "Hodowla")
+                        .WithMany("Zwierzeta")
+                        .HasForeignKey("HodowlaId");
+
+                    b.HasOne("PetHelp.Server.Models.ApplicationUser", "Wlasciciel")
+                        .WithMany()
+                        .HasForeignKey("WlascicielId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PetHelp.Server.Models.rasa_psa", "rasa")
+                        .WithMany()
+                        .HasForeignKey("rasy_psowId");
+
+                    b.Navigation("Hodowla");
+
+                    b.Navigation("Wlasciciel");
+
+                    b.Navigation("rasa");
+                });
+
+            modelBuilder.Entity("PetHelp.Server.Models.Hodowla", b =>
+                {
+                    b.Navigation("Zwierzeta");
+                });
+
+            modelBuilder.Entity("PetHelp.Server.Models.Zwierze", b =>
+                {
+                    b.Navigation("Zdjecie");
                 });
 #pragma warning restore 612, 618
         }

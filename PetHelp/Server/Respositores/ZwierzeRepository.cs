@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetHelp.Server.Data;
-using PetHelp.Server.Data.Migrations;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
 using PetHelp.Shared.DTO;
@@ -60,9 +59,7 @@ public class ZwierzeRepository : IZwierzeRepository
             Zdjecie_MIME = nowe.Zdjecie_MIME,
             Zdjecie_Name = nowe.Zdjecie_Name,
             Zdjecie_Data = nowe.Zdjecie_Data,
-            rasy_psowId = nowe.rasaId,
-            rasa = null,
-
+            rasy_psowId = nowe.rasaId
         };
         context.Zwierzeta.Add(zwierze);
         context.SaveChanges();

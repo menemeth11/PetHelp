@@ -9,11 +9,11 @@ using PetHelp.Server.Data;
 
 #nullable disable
 
-namespace PetHelp.Server.Data.Migrations
+namespace PetHelp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221107223137_rasapsadzialachyba")]
-    partial class rasapsadzialachyba
+    [Migration("20221108183534_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

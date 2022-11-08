@@ -18,7 +18,7 @@ public class ZwierzeDTO
 	public DateTime? Szczepienie_Wscieklizna_NastepnyTermin { get; set; }
 	public int HodowlaId { get; set; }
 	public string WlascicielId { get; set; }
-	public int rasaId { get; set; } = 372;
+	public int rasaId { get; set; } = 1;
 	public string Zdjecie_MIME { get; set; } = String.Empty;
     public string Zdjecie_Name { get; set; } = String.Empty;
     public byte[] Zdjecie_Data { get; set; } = Array.Empty<byte>();

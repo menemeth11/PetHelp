@@ -38,6 +38,6 @@ public class Zwierze
     public byte[] Zdjecie_Data { get; internal set; }
 
     [ForeignKey("rasa")]
-    public int? rasy_psowId { get; set; } = 372;
-    public rasa_psa? rasa { get; set; }
+    public int? rasy_psowId { get; set; }
+    public virtual rasa_psa? rasa { get; set; }
 }
