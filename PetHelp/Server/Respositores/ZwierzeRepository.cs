@@ -70,6 +70,7 @@ public class ZwierzeRepository : IZwierzeRepository
     {
         return context.Zwierzeta
             .Where(x => x.Id == zwierzakId).Include(x => x.Zdjecie)
+            .Include(x => x.rasa)
             .FirstOrDefault();
 
         /*

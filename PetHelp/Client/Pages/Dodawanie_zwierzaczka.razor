@@ -24,7 +24,15 @@
                 <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek" />
 
                 Rasa:
-                
+                <select @bind="nowyzwierzak.rasaId">
+                    @if (RasyPsow.Any())
+                    {
+                        @foreach (var rasa in RasyPsow)
+                       {
+                            <option value="@rasa.Id">@rasa.Nazwa</option>   
+                       }
+                    }
+                </select>
 
                 Imie:
                 <input type="text" @bind="nowyzwierzak.Imie" />
@@ -110,6 +118,21 @@
 
 @code {
     [Parameter] public string hodowlaID { get; set; }
+    private RasaDTO[] RasyPsow { get; set; } = Array.Empty<RasaDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        this.CurrentUserId = authstate.User.Claims.First(x => x.Type == "sub").Value;
+
+        //load rasy from api
+        var response = await KlientHTTP.GetAsync("Common/Rasy/Pies");
+        if (response.IsSuccessStatusCode)
+        {
+            // succesed call to api, fetd data or  if null, create empty list
+            this.RasyPsow = await response.Content.ReadFromJsonAsync<RasaDTO[]>() ?? Array.Empty<RasaDTO>();
+        }
+    }
 
     private void BackToLiat()
     {
@@ -126,10 +149,4 @@
     }
 
     public string CurrentUserId { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
-        this.CurrentUserId = authstate.User.Claims.First(x => x.Type == "sub").Value;
-    }
 }

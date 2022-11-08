@@ -91,6 +91,8 @@ public class HomeController : ControllerBase
             Szczepienie_Wscieklizna_NastepnyTermin = zwierz.Szczepienie_Wscieklizna_NastepnyTermin,
             HodowlaId = (int)zwierz.HodowlaId,
             WlascicielId = zwierz.WlascicielId,
+            rasaId = zwierz.Id,
+            rasaNazwa = zwierz.rasa.Nazwa,
             Zdjecie_MIME = zwierz.Zdjecie_MIME,
             Zdjecie_Name = zwierz.Zdjecie_Name,
             Zdjecie_Data = zwierz.Zdjecie_Data,
