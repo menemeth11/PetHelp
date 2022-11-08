@@ -1,5 +1,4 @@
-﻿using PetHelp.Server.Data.Migrations;
-using PetHelp.Server.Models;
+﻿using PetHelp.Server.Models;
 using PetHelp.Shared.DTO;
 
 namespace PetHelp.Server.Interfaces

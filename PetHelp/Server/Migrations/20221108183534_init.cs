@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace PetHelp.Server.Data.Migrations
+#nullable disable
+
+namespace PetHelp.Server.Migrations
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -58,7 +60,7 @@ namespace PetHelp.Server.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Expiration = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 51590, nullable: false)
+                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 50000, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,11 +74,11 @@ namespace PetHelp.Server.Data.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Use = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
+                    Use = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Algorithm = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsX509Certificate = table.Column<bool>(type: "bit", nullable: false),
                     DataProtected = table.Column<bool>(type: "bit", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 51590, nullable: false)
+                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,11 +98,24 @@ namespace PetHelp.Server.Data.Migrations
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Expiration = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ConsumedTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 51590, nullable: false)
+                    Data = table.Column<string>(type: "nvarchar(max)", maxLength: 50000, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PersistedGrants", x => x.Key);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "rasy_psow",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nazwa = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_rasy_psow", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,6 +224,96 @@ namespace PetHelp.Server.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ListaHodowli",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nazwa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WlascicielID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ListaHodowli", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_ListaHodowli_AspNetUsers_WlascicielID",
+                        column: x => x.WlascicielID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Zwierzeta",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Imie = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gatunek = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Umaszczenie = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DataUrodzenia = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DataDodania = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Kastracja = table.Column<bool>(type: "bit", nullable: false),
+                    Waga_Pomiar = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Waga_Wartosc = table.Column<float>(type: "real", nullable: true),
+                    Info_Dodatkowe = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Info_Schorzenia = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Info_Choroby = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Szczepienie_Wscieklizna_Status = table.Column<bool>(type: "bit", nullable: false),
+                    Szczepienie_Wscieklizna_Data = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Szczepienie_Wscieklizna_NastepnyTermin = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    HodowlaId = table.Column<int>(type: "int", nullable: true),
+                    WlascicielId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Zdjecie_MIME = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Zdjecie_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Zdjecie_Data = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    rasy_psowId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Zwierzeta", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Zwierzeta_AspNetUsers_WlascicielId",
+                        column: x => x.WlascicielId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Zwierzeta_ListaHodowli_HodowlaId",
+                        column: x => x.HodowlaId,
+                        principalTable: "ListaHodowli",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_Zwierzeta_rasy_psow_rasy_psowId",
+                        column: x => x.rasy_psowId,
+                        principalTable: "rasy_psow",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Zalaczniks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Zdjecie_MIME = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Zdjecie_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Zdjecie_Data = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    ZwierzeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Zalaczniks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Zalaczniks_Zwierzeta_ZwierzeId",
+                        column: x => x.ZwierzeId,
+                        principalTable: "Zwierzeta",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -265,6 +370,11 @@ namespace PetHelp.Server.Data.Migrations
                 column: "Use");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ListaHodowli_WlascicielID",
+                table: "ListaHodowli",
+                column: "WlascicielID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PersistedGrants_ConsumedTime",
                 table: "PersistedGrants",
                 column: "ConsumedTime");
@@ -283,6 +393,27 @@ namespace PetHelp.Server.Data.Migrations
                 name: "IX_PersistedGrants_SubjectId_SessionId_Type",
                 table: "PersistedGrants",
                 columns: new[] { "SubjectId", "SessionId", "Type" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Zalaczniks_ZwierzeId",
+                table: "Zalaczniks",
+                column: "ZwierzeId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Zwierzeta_HodowlaId",
+                table: "Zwierzeta",
+                column: "HodowlaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Zwierzeta_rasy_psowId",
+                table: "Zwierzeta",
+                column: "rasy_psowId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Zwierzeta_WlascicielId",
+                table: "Zwierzeta",
+                column: "WlascicielId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -312,7 +443,19 @@ namespace PetHelp.Server.Data.Migrations
                 name: "PersistedGrants");
 
             migrationBuilder.DropTable(
+                name: "Zalaczniks");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Zwierzeta");
+
+            migrationBuilder.DropTable(
+                name: "ListaHodowli");
+
+            migrationBuilder.DropTable(
+                name: "rasy_psow");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

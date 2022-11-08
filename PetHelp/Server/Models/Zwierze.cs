@@ -8,7 +8,6 @@ public class Zwierze
     public int Id { get; set; }
     public string Imie { get; set; } = "- nie podano -";
     public string Gatunek { get; set; } = "- nie podano -";
-    public string Rasa { get; set; } = "- nie podano -";
     public string Umaszczenie { get; set; } = "- nie podano -";
     public DateTime DataUrodzenia { get; set; }
     public DateTime DataDodania { get; set; }
@@ -37,4 +36,8 @@ public class Zwierze
     public string Zdjecie_MIME { get; internal set; }
     public string Zdjecie_Name { get; internal set; }
     public byte[] Zdjecie_Data { get; internal set; }
+
+    [ForeignKey("rasa")]
+    public int? rasy_psowId { get; set; }
+    public virtual rasa_psa? rasa { get; set; }
 }
