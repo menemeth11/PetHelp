@@ -11,64 +11,154 @@
 
 <h1>Detale zwierzaka</h1>
 
+@if (zmiana)
+{
+    <InputFile OnChange="@LoadFile" title="Zmien zdjecie" />
+}
+<img src="@ZwierzeImageUrl" @onmouseover="@OnMouseOver" @onmouseout="@OnMouseOut"/>
+
 <input type="button" value="Back to list" @onclick="BackToLiat" />
 Gatunek:
-<input class="btn btn-primary" type="text" @bind="zwierz.Gatunek" />
+@if (IsChanged)
+{
+    <input type="text" @bind="zwierz.Gatunek" />
+}
+else
+    @zwierz.Gatunek
+
 <br />
 Rasa:
 @zwierz.rasaNazwa
 <br />
 Imie:
+@if(IsChanged)
+{
 <input type="text" @bind="zwierz.Imie" />
+}
+else
+    @zwierz.Imie
+
 <br />
 Umaszczenie:
-<input type="text" @bind="zwierz.Umaszczenie" />
+@if (IsChanged)
+{
+    <input type="text" @bind="zwierz.Umaszczenie" />
+}
+else
+    @zwierz.Umaszczenie
+
 <br />
 Data pomiaru waga:
-<input type="date" @bind="zwierz.Waga_Pomiar" />
+@if (IsChanged)
+{
+    <input type="date" @bind="zwierz.Waga_Pomiar" />
+}
+else
+{
+    @(zwierz.Waga_Pomiar.HasValue ? @zwierz.Waga_Pomiar.Value.ToShortDateString(): "Brak daty")
+}
 <br />
 Waga:
-<input type="number" @bind="zwierz.Waga_Wartosc" />
+@if (IsChanged)
+{
+    <input type="number" @bind="zwierz.Waga_Wartosc" />
+}
+else
+    @zwierz.Waga_Wartosc
+
 <br />
 Data urodzenia:
-<input type="date" @bind="zwierz.DataUrodzenia" />
+@if (IsChanged)
+{
+    <input type="date" @bind="zwierz.DataUrodzenia" />
+}
+else
+    @zwierz.DataUrodzenia.ToShortDateString()
+
+
 <br />
 Kastracja:
-<input type="checkbox" @bind="zwierz.Kastracja" />
+@if (IsChanged)
+{
+    <input type="checkbox" @bind="zwierz.Kastracja" />
+}
+else
+    @zwierz.Kastracja
+
 <br />
 Info Dodatkowe:
-<input type="text" @bind="zwierz.Info_Dodatkowe" />
+@if (IsChanged)
+{
+    <input type="text" @bind="zwierz.Info_Dodatkowe" />
+}
+else
+    @zwierz.Info_Dodatkowe
+
 <br />
 Info Choroby:
-<input type="text" @bind="zwierz.Info_Choroby" />
+@if (IsChanged)
+{
+    <input type="text" @bind="zwierz.Info_Choroby" />
+}
+else
+    @zwierz.Info_Choroby
+
 <br />
 Info Schorzenia:
-<input type="text" @bind="zwierz.Info_Schorzenia" />
+@if (IsChanged)
+{
+    <input type="text" @bind="zwierz.Info_Schorzenia" />
+}
+else
+    @zwierz.Info_Schorzenia
+
 <br />
 
 Szczepienie Wscieklizna Data:
-<input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
+@if (IsChanged)
+{
+    <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
+}
+else
+    @(zwierz.Szczepienie_Wscieklizna_Data.HasValue ? zwierz.Szczepienie_Wscieklizna_Data.Value.ToShortDateString() : "Brak daty")
 <br />
 Szczepienie Wscieklizna Status:
-<input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
+@if (IsChanged)
+{
+    <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
+}
+else
+    @zwierz.Szczepienie_Wscieklizna_Status
+
 <br />
 Szczepienie Wscieklizna NastepnyTermin:
-<input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
+@if (IsChanged)
+{
+    <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
+}
+else
+    @(zwierz.Szczepienie_Wscieklizna_NastepnyTermin.HasValue ? @zwierz.Szczepienie_Wscieklizna_NastepnyTermin.Value.ToShortDateString() : "Brak daty")
+
+
 <br />
 
-<input type="button" value="edytuj gnoja" @onclick="Aktualizuj">
+<input type="button" value="Edycja" @onclick="()=> IsChanged=true">
+<input type="button" value="Zapisz" @onclick="Aktualizuj">
 <input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
 
 
-@code {
+    @code {
     // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
     [Parameter] public string ZwierzeId { get; set; }
     // page loacl property for html binding and use in code
     private ZwierzeDTO zwierz { get; set; } = new();
     // property for keep track of current Zwierz state if its changed or no (used in undo-rever button)
     private bool IsChanged { get; set; } = false;
+    private bool zmiana { get; set; } = false;
     // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
     private string _source_Json { get; set; }
+    private long maxFileSize = 5 * 1024 * 1024;
+
     protected override async Task OnInitializedAsync()
     {
         // initial api call to our server to obtain ZwierzDTO data existing in database under Key corresponded to ZwierzeId
@@ -105,10 +195,15 @@ Szczepienie Wscieklizna NastepnyTermin:
     }
     private async Task Aktualizuj()
     {
+
         // update zwierz data in database trough Post api call with updated data in body section
         await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
         // data is changed, api is called, changed page state 'is changed' to true ( its turn ON undo button )
-        IsChanged = true;
+        ZwierzeDTO stary = _state.Zwierzeta.Where(x => x.Id == zwierz.Id).First();
+        int index = _state.Zwierzeta.IndexOf(stary);
+        _state.Zwierzeta[index] = zwierz;
+        IsChanged = false;
+        zmiana = false;
     }
     private async Task UndoChanges()
     {
@@ -118,5 +213,36 @@ Szczepienie Wscieklizna NastepnyTermin:
         var result = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
         // change this page state 'is changed' to false, data back to orginal from before any modifications
         IsChanged = false;
+    }
+
+    private async Task LoadFile(InputFileChangeEventArgs e)
+    {
+        zwierz.Zdjecie_MIME = e.File.ContentType;
+        zwierz.Zdjecie_Name = e.File.Name;
+        using var file = new StreamContent(e.File.OpenReadStream(maxFileSize));
+        zwierz.Zdjecie_Data = await file.ReadAsByteArrayAsync();
+        zmiana = false;
+        StateHasChanged();
+    }
+
+    string ZwierzeImageUrl
+    {
+        get
+        {
+            if (zwierz.Zdjecie_Data.Length == 0) return "/Images/No-Image.png";
+            return $"data:{zwierz.Zdjecie_MIME};base64,{Convert.ToBase64String(zwierz.Zdjecie_Data)}";           
+        }
+    }
+
+    private async Task OnMouseOver()
+    {
+        if(IsChanged)
+            zmiana = true;
+    }
+
+    private async Task OnMouseOut()
+    {
+
+
     }
 }

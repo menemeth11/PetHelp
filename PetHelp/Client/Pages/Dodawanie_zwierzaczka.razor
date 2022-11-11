@@ -1,6 +1,7 @@
 ﻿@page "/dodawanie/{hodowlaID}"
 @using PetHelp.Client.Nowy_folder
 @using PetHelp.Shared.DTO
+@using Microsoft.AspNetCore.Components.Forms
 @inject HttpClient KlientHTTP
 @inject NavigationManager Navigation
 @inject StateManager _state;
@@ -16,8 +17,11 @@
         </div>
         <div class="row content">
             <div class="" style="width:33.33%; background-color:green;  ">
-                <span> IMAGE </span>
-                <span> Zdjęcie zwierzęcia </span>
+             <!--   <span> IMAGE </span>
+            <span> Zdjęcie zwierzęcia </span> -->
+            <InputFile OnChange="@LoadFile" title="dodaj zdjecie"/>
+            <img src="@ZwierzeImageUrl" />
+
             </div>
             <div class="" style="width:33.33%; background-color:red; ">
                 Gatunek:
@@ -72,8 +76,8 @@
 
             </div>
             <div class="" style="width:33.33%; background-color:green;  ">
-                <span> IMAGE </span>
-                <span> Zdjęcie zwierzęcia </span>
+               <!-- <span> IMAGE </span>
+             <span> Zdjęcie zwierzęcia </span>-->
             </div>
         </div>
         <div class="row footer">
@@ -119,7 +123,11 @@
 @code {
     [Parameter] public string hodowlaID { get; set; }
     private RasaDTO[] RasyPsow { get; set; } = Array.Empty<RasaDTO>();
-
+    private List<IBrowserFile> loadedFiles = new(); //here
+    private long maxFileSize = 5 * 1024 * 1024; ///here
+    private int maxAllowedFiles = 1; //here
+    //private string zdjecie = "";
+    //private string mime = "";
     protected override async Task OnInitializedAsync()
     {
         var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
@@ -149,4 +157,21 @@
     }
 
     public string CurrentUserId { get; set; }
+
+    private async Task LoadFile(InputFileChangeEventArgs e)
+    {
+        nowyzwierzak.Zdjecie_MIME = e.File.ContentType;
+        nowyzwierzak.Zdjecie_Name = e.File.Name;
+        using var file = new StreamContent(e.File.OpenReadStream(maxFileSize));
+        nowyzwierzak.Zdjecie_Data = await file.ReadAsByteArrayAsync();
+    }
+
+    string ZwierzeImageUrl
+    {
+        get
+        {
+            if (nowyzwierzak.Zdjecie_Data.Length == 0) return "/Images/No-Image.png";
+            return $"data:{nowyzwierzak.Zdjecie_MIME};base64,{Convert.ToBase64String(nowyzwierzak.Zdjecie_Data)}";
+        }
+    }
 }
