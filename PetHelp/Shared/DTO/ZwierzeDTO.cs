@@ -4,7 +4,8 @@ public class ZwierzeDTO
 	public int Id { get; set; }
     public string Imie { get; set; } = "- nie podano -";
     public string Gatunek { get; set; } = "- nie podano -";
-	public string Umaszczenie { get; set; } = "- nie podano -";
+    public int GatunekID { get; set; }
+    public string Umaszczenie { get; set; } = "- nie podano -";
 	public DateTime DataUrodzenia { get; set; } = DateTime.Now;
 	public DateTime DataDodania { get; set; } = DateTime.Now;
 	public bool Kastracja { get; set; } = false;

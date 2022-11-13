@@ -1,6 +1,6 @@
 ﻿using PetHelp.Shared.DTO;
 
-namespace PetHelp.Client.Nowy_folder;
+namespace PetHelp.Client.States;
 
 public class StateManager
 {

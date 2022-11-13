@@ -11,19 +11,19 @@ namespace PetHelp.Server.Controllers;
 [ApiController]
 public class HomeController : ControllerBase
 {
-    private readonly IHodowlaRepositor HodowlaRepo;
+    private readonly IHodowlaRepositor _hodowlaRepo;
     private readonly IZwierzeRepository _zwierzeRepo;
 
     public HomeController(IHodowlaRepositor hodowlaRepo, IZwierzeRepository zwierzeRepo)
     {
-        HodowlaRepo = hodowlaRepo;
+        _hodowlaRepo = hodowlaRepo;
         _zwierzeRepo = zwierzeRepo;
     }
 
     [HttpGet("GetUserHodowla/{ID}")]
     public List<HodowlaDTO> GetUserHodowla(string ID)
     {
-        var x = HodowlaRepo.GetListaHodowli(ID);
+        var x = _hodowlaRepo.GetListaHodowli(ID);
         return x.Select(Hodowla => new HodowlaDTO()
         {
             Id = Hodowla.id,
@@ -35,7 +35,7 @@ public class HomeController : ControllerBase
     [HttpPost("Dodajhodowle")]
     public HodowlaDTO Dodajhodowle(HodowlaRequestDTO x)
     {
-        Hodowla hodowla = HodowlaRepo.PostListaHodowli(x);
+        Hodowla hodowla = _hodowlaRepo.PostListaHodowli(x);
         return new HodowlaDTO()
         {
             Id = hodowla.id,
@@ -134,6 +134,18 @@ public class HomeController : ControllerBase
     public void AktualizujZwierze(ZwierzeDTO x)
     {
         _zwierzeRepo.AktualizujZwierze(x);
+    }
+
+    [HttpDelete("Usun/{idzwierzaka}")]
+    public void UsunZwierze(int idzwierzaka)
+    {
+        _zwierzeRepo.Usun(idzwierzaka);
+    }
+
+    [HttpDelete("UsunHodowle/{idhodowli}")]
+    public void UsunHodowle(int idhodowli)
+    {
+        _hodowlaRepo.Usun(idhodowli);
     }
 }
 

@@ -106,4 +106,10 @@ public class ZwierzeRepository : IZwierzeRepository
 
         context.SaveChanges();
     }
+
+    public void Usun(int idzwierzaka)
+    {
+        context.Zwierzeta.Remove(context.Zwierzeta.Find(idzwierzaka));
+        context.SaveChanges();
+    }
 }

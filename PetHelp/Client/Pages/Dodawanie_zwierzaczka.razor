@@ -1,7 +1,8 @@
 ﻿@page "/dodawanie/{hodowlaID}"
-@using PetHelp.Client.Nowy_folder
+@using PetHelp.Client.States
 @using PetHelp.Shared.DTO
 @using Microsoft.AspNetCore.Components.Forms
+@using PetHelp.Shared.Enums
 @inject HttpClient KlientHTTP
 @inject NavigationManager Navigation
 @inject StateManager _state;
@@ -25,13 +26,20 @@
             </div>
             <div class="" style="width:33.33%; background-color:red; ">
                 Gatunek:
-                <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek" />
+@*                <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek" />*@
+                <select @bind="nowyzwierzak.GatunekID">
+                @foreach (RasyEnum x in Enum.GetValues(typeof(RasyEnum)))
+                {
+                    <option value="@((int)x)">@x</option>
+                }
+            </select>
 
+                
                 Rasa:
                 <select @bind="nowyzwierzak.rasaId">
-                    @if (RasyPsow.Any())
+                    @if (Rasy.Any())
                     {
-                        @foreach (var rasa in RasyPsow)
+                        @foreach (var rasa in Rasy.Where(x=> x.gatunekID == nowyzwierzak.GatunekID))
                        {
                             <option value="@rasa.Id">@rasa.Nazwa</option>   
                        }
@@ -122,7 +130,7 @@
 
 @code {
     [Parameter] public string hodowlaID { get; set; }
-    private RasaDTO[] RasyPsow { get; set; } = Array.Empty<RasaDTO>();
+    private RasaDTO[] Rasy { get; set; } = Array.Empty<RasaDTO>();
     private List<IBrowserFile> loadedFiles = new(); //here
     private long maxFileSize = 5 * 1024 * 1024; ///here
     private int maxAllowedFiles = 1; //here
@@ -139,12 +147,13 @@
         if (response.IsSuccessStatusCode)
         {
             // succesed call to api, fetd data or  if null, create empty list
-            this.RasyPsow = await response.Content.ReadFromJsonAsync<RasaDTO[]>() ?? Array.Empty<RasaDTO>();
+            this.Rasy = await response.Content.ReadFromJsonAsync<RasaDTO[]>() ?? Array.Empty<RasaDTO>();
         }
     }
 
     private void BackToLiat()
     {
+        _state.SelectedHodowlaId = nowyzwierzak.HodowlaId;
         Navigation.NavigateTo("/Home");
     }
 
@@ -154,6 +163,7 @@
     {
         nowyzwierzak.WlascicielId = CurrentUserId;
         nowyzwierzak.HodowlaId = Convert.ToInt32(hodowlaID);
+        nowyzwierzak.Gatunek = ((RasyEnum)nowyzwierzak.GatunekID).ToString();
         var respond = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO>($"Home/DodajZwierze", nowyzwierzak);
         //od tego
         if(!respond.IsSuccessStatusCode)
@@ -170,6 +180,7 @@
         }
 
         _state.Zwierzeta.Add(newZwierz);
+        _state.SelectedHodowlaId = nowyzwierzak.HodowlaId;
         Navigation.NavigateTo("/home"); //??????
     }
 
