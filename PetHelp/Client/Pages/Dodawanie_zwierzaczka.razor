@@ -126,10 +126,11 @@
     private List<IBrowserFile> loadedFiles = new(); //here
     private long maxFileSize = 5 * 1024 * 1024; ///here
     private int maxAllowedFiles = 1; //here
-    //private string zdjecie = "";
-    //private string mime = "";
+                                     //private string zdjecie = "";
+                                     //private string mime = "";
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine(_state);
         var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
         this.CurrentUserId = authstate.User.Claims.First(x => x.Type == "sub").Value;
 
@@ -154,6 +155,22 @@
         nowyzwierzak.WlascicielId = CurrentUserId;
         nowyzwierzak.HodowlaId = Convert.ToInt32(hodowlaID);
         var respond = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO>($"Home/DodajZwierze", nowyzwierzak);
+        //od tego
+        if(!respond.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Nie udało sie dodaź zwierzaka");
+            return;
+        }
+
+        ZwierzeDTO? newZwierz = await respond.Content.ReadFromJsonAsync<ZwierzeDTO>();
+        if(newZwierz is null)
+        {
+            Console.WriteLine("Niepowodzenie przy dodawaniu zwierzaka. Pusty obiekt!");
+            return;
+        }
+
+        _state.Zwierzeta.Add(newZwierz);
+        Navigation.NavigateTo("/home"); //??????
     }
 
     public string CurrentUserId { get; set; }
