@@ -9,4 +9,5 @@ public interface IZwierzeRepository
     public Zwierze DodajZwierze(ZwierzeDTO nowe);
     public List<Zwierze> GetByHodowla(int hodowlaId, bool includeAttachment);
     public Zwierze? GetById(int zwierzakId);
+    void Usun(int idzwierzaka);
 }

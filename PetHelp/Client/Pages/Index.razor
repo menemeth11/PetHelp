@@ -11,7 +11,7 @@
 
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Authorization
-@using PetHelp.Client.Nowy_folder
+@using PetHelp.Client.States
 @using PetHelp.Shared.DTO
 
 <PageTitle>Index</PageTitle>
@@ -34,6 +34,10 @@
 
         <!-- Button trigger modal -->
         <input type="button" class="round-gradient bottom-right shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" value="Dodaj" />
+        @if (SelectedHodowla > 0)
+        {
+            <input type="button" class="round-gradient bottom-right shadow" style="margin-right:100px!important" @onclick="@UsunH" value="Usuń" />
+        }
         <!-- Modal -->
         <div @ref="NewHodowlaModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-keyboard="false" id="staticBackdrop">
             <div class="modal-dialog modal-dialog-centered">
@@ -209,7 +213,7 @@
         // ładujemy otrzymane informacje z serwera zawierające nowoutworzoną hodowle w tym jej id ( klucz głóny w tabeli/sql) 
         // istnieje ryzyko ze serwer nie zwróci nam wartości, dlatego HodowlaDTO? <- może być puste
         HodowlaDTO? result = await respond.Content.ReadFromJsonAsync<HodowlaDTO>();
-        
+
 
         // Obiekt hodowli z serwera jest pusty,
         if (result == null)
@@ -226,8 +230,9 @@
         await LoadAnimals(result.Id);
         // pomyślnie wykonane wszystkie operacje,hodowla dodana, zamykamy aktualnie używane okno dialogowe( referencja zmiennej: NewHodowlaModal)
         await HideModal(this.NewHodowlaModal);
+        NazwaHodowlil = "";
     }
-    
+
     private async Task HideModal(ElementReference modal)
     {
         // przechwycenie ewentualnego błędu podczas użycia skryptów js w razie gdyby nie były zaimportowane do pamięci strony (zmienna: module)
@@ -259,7 +264,7 @@
                 // załadowanie do pamięci strony zwierząt otrzymanych w odpowiedzi serwera
                 this.Zwierzeta = respond;
                 // zaktualizowanie cache przechowującego liste zwierząt o dane pobrane z serwera , w celu ich póżniejszego łatwego/szybkiego wykoprzystania
-                 _state.Zwierzeta = respond;
+                _state.Zwierzeta = respond;
             }
         } 
         else
@@ -280,11 +285,24 @@
         Navigation.NavigateTo($"podglad/{petId}");
     }
 
+    private async Task UsunH()
+    {
+        await KlientHTTP.DeleteAsync($"/home/UsunHodowle/{SelectedHodowla}");
+        Hodowle.Remove(Hodowle.Find(x => x.Id == SelectedHodowla));
+        _state.SelectedHodowlaId = -1;
+        SelectedHodowla = -1;
+        Zwierzeta.Clear();
+        Boxes.Clear();
+        StateHasChanged();
+    }
+
  // ------------ UI, JS, safe to comment ----------------------
     public async Task CheckBoxes()
     {
         //odpalenie skryptu js odświeżającego animacje wjazdu boxów (kontenerów z infomacjami o hodowli ) niezbędne tylko dla UI
-       await module.InvokeVoidAsync("checkBoxes", Boxes.Values);
+        if(Boxes != null && Boxes.Count > 0){
+            await module.InvokeVoidAsync("checkBoxes", Boxes.Values);
+        }
     }
 }
 

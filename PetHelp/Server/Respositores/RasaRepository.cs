@@ -20,13 +20,14 @@ public class RasaRepository : IRasaRepository
     {
         RasaDTO[] rasy = Array.Empty<RasaDTO>();
         // load available god types from database
-        rasa_psa[] _rasy = await context.rasy_psow.ToArrayAsync();
+        rasy[] _rasy = await context.Rasy.ToArrayAsync();
         if (_rasy.Length > 0)
         {
             rasy = _rasy.Select(x => new RasaDTO
             {
                 Id = x.Id,
-                Nazwa = x.Nazwa
+                Nazwa = x.Nazwa,
+                gatunekID = x.gatunekID
             }).ToArray();
         }
 

@@ -39,5 +39,5 @@ public class Zwierze
 
     [ForeignKey("rasa")]
     public int? rasy_psowId { get; set; }
-    public virtual rasa_psa? rasa { get; set; }
+    public virtual rasy? rasa { get; set; }
 }

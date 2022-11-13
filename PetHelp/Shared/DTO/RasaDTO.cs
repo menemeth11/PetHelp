@@ -10,5 +10,6 @@ namespace PetHelp.Shared.DTO
     {
         public int Id { get; set; }
         public string Nazwa { get; set; } = String.Empty;
+        public int gatunekID { get; set; }
     }
 }

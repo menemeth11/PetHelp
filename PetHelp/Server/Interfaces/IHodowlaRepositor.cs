@@ -7,5 +7,6 @@ namespace PetHelp.Server.Interfaces
     {
         public List<Hodowla> GetListaHodowli(string ID);
         public Hodowla PostListaHodowli(HodowlaRequestDTO data);
+        void Usun(int idhodowli);
     }
 }
