@@ -9,115 +9,189 @@
 
 @inject IJSRuntime JS
 
-    <div class="box">
-        <div class="row header">
-            <div class="backButton" style="background-color:blue;">
-                <input type="button" value="Back to list" @onclick="BackToLiat" />
-            </div>
+<div class="profile">
+
+        <!-- Top navbar -->
+        <div class="profile-topnav">
+            <input type="button" value="Back to list" @onclick="BackToLiat" />
+        <h2>Dodaj nowe zwierzę</h2>
         </div>
-        <div class="row content">
-            <div class="" style="width:33.33%; background-color:green;  ">
-             <!--   <span> IMAGE </span>
-            <span> Zdjęcie zwierzęcia </span> -->
-            <InputFile OnChange="@LoadFile" title="dodaj zdjecie"/>
+
+        <div class="wrapper">
+            <div class="profile-avatar">
+            <InputFile OnChange="@LoadFile" title="dodaj zdjecie" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1;" />
+                <svg lns="http://www.w3.org/2000/svg" viewBox="0 0 22 22"><path d="m3.285 3c-.449 0-.813.364-.813.813v14.375c0 .449.364.813.813.813h15.43c.449 0 .813-.364.813-.813v-14.375c0-.449-.364-.813-.813-.813h-15.43m10.715 1.4h1.199v2.4h2.4v1.199h-2.4v2.4h-1.199v-2.4h-2.4v-1.199h2.4v-2.4m-5.58 5.273c.178-.017.367.075.523.279l3.215 4.205c.313.409.861.444 1.223.078l.785-.797c.361-.366.894-.322 1.189.1l2.037 2.912c.294.422.116.764-.398.764h-5.994-5.729c-.515 0-.744-.372-.512-.832l3.197-6.338c.116-.23.284-.354.463-.371" transform="translate(.0001-.002)" stroke="none" fill="white" stroke-opacity=".8"/></svg>
             <img src="@ZwierzeImageUrl" />
-
             </div>
-            <div class="" style="width:33.33%; background-color:red; ">
-                Gatunek:
-                <input class="btn btn-primary" type="text" @bind="nowyzwierzak.Gatunek" />
 
-                Rasa:
-                <select @bind="nowyzwierzak.rasaId">
-                    @if (RasyPsow.Any())
-                    {
-                        @foreach (var rasa in RasyPsow)
-                       {
-                            <option value="@rasa.Id">@rasa.Nazwa</option>   
-                       }
-                    }
-                </select>
+            <div class="profile-column">
+                <div class="profile-box box-dane">
+                    <div class="profile-box-title">
+                        <h5>Dane podstawowe:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <article>
+                            <div class="tabler">
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Gatunek
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    <input type="text" @bind="nowyzwierzak.Gatunek" />
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Rasa
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <select @bind="nowyzwierzak.rasaId">
+                                        @if (RasyPsow.Any())
+                                        {
+                                            @foreach (var rasa in RasyPsow)
+                                           {
+                                                <option value="@rasa.Id">@rasa.Nazwa</option>   
+                                           }
+                                        }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Imię
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <input type="text" @bind="nowyzwierzak.Imie" />
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Umaszczenie
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <input type="text" @bind="nowyzwierzak.Umaszczenie" />
+                                    </div>
+                                </div>                                
+                                <div class="rower">
+                                    <div class="coler coler_w25">
+                                        Waga
+                                    </div>
+                                    <div class="coler subcol coler_w25">
+                                        <div class="coler">
+                                            Data pomiaru
+                                        </div>
+                                        <div class="coler">
+                                            <input type="date" @bind="nowyzwierzak.Waga_Pomiar" />
+                                        </div>
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <input type="number" @bind="nowyzwierzak.Waga_Wartosc" />
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w25">
+                                        Wiek
+                                    </div>
+                                    <div class="coler subcol coler_w25">
+                                        <div class="coler">
+                                            Data urodzenia
+                                        </div>
+                                        <div class="coler">
+                                            <input type="date" @bind="nowyzwierzak.DataUrodzenia" />
+                                    </div>
+                                </div>
+                                <div class="coler coler_w50">
+                                        1 rok
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Kastracja
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        Kastracja:
+                                        <input type="checkbox" @bind="nowyzwierzak.Kastracja" />
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
 
-                Imie:
-                <input type="text" @bind="nowyzwierzak.Imie" />
-
-                Umaszczenie:
-                <input type="text" @bind="nowyzwierzak.Umaszczenie" />
-
-                Data pomiaru waga:
-                <input type="date" @bind="nowyzwierzak.Waga_Pomiar" />
-
-                Waga:
-                <input type="number" @bind="nowyzwierzak.Waga_Wartosc" />
-
-                Data urodzenia:
-                <input type="date" @bind="nowyzwierzak.DataUrodzenia" />
-
-                Kastracja:
-                <input type="checkbox" @bind="nowyzwierzak.Kastracja" />
-
-                Info Dodatkowe:
-                <input type="text" @bind="nowyzwierzak.Info_Dodatkowe" />
-
-                Info Choroby:
-                <input type="text" @bind="nowyzwierzak.Info_Choroby" />
-
-                Info Schorzenia:
-                <input type="text" @bind="nowyzwierzak.Info_Schorzenia" />
-
-                Szczepienie Wscieklizna Data:
-                <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Data" />
-
-                Szczepienie Wscieklizna Status:
-                <input type="checkbox" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Status" />
-
-                Szczepienie Wscieklizna NastepnyTermin:
-                <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_NastepnyTermin" />
-
+                <div class="profile-box box-dodatkowe">
+                    <div class="profile-box-title">
+                        <h5>Info dodatkowe:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <article>
+                            <textarea @bind="nowyzwierzak.Info_Dodatkowe" />
+                        </article>
+                    </div>
+                </div>
             </div>
-            <div class="" style="width:33.33%; background-color:green;  ">
-               <!-- <span> IMAGE </span>
-             <span> Zdjęcie zwierzęcia </span>-->
+
+            <div class="profile-column">
+                
+                <div class="profile-box box-choroby">
+                    <div class="profile-box-title">
+                        <h5>Dane chorobowe:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <h5>Przebyte choroby</h5>
+                        <article>
+                            <textarea @bind="nowyzwierzak.Info_Choroby" />
+                        </article>
+                        <h5>Aktualne Schorzenia</h5>
+                        <article>
+                            <textarea @bind="nowyzwierzak.Info_Schorzenia" />
+                        </article>
+                    </div>
+                </div>
+
+                <div class="profile-box box-szczepienia">
+                    <div class="profile-box-title">
+                        <h5>Szczepienia:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <article>
+                            <div class="tabler">
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Data szczepienia
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Data" />
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Czy zaszczepiony
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <input type="checkbox" @bind="nowyzwierzak.Szczepienie_Wscieklizna_Status" />
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Następny termin szczepienia
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        <input type="date" @bind="nowyzwierzak.Szczepienie_Wscieklizna_NastepnyTermin" />
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
             </div>
+            </div>
+
         </div>
-        <div class="row footer">
-            <div class="backButton" style="background-color:blue; padding:5px;">
-                <input class="confirmButton" type="button" value="Dodaj" @onclick="test" />
-            </div>
+    
+        <!-- bottom nav -->
+        <div class="profile-bottomnav">
+            <input class="confirmButton" type="button" value="Dodaj" @onclick="test" />
         </div>
-    </div>
-
-<style>
-    .box {
-        display: flex;
-        flex-flow: column;
-        height: 100%;
-    }
-
-        .box .row {
-            border: 1px dotted grey;
-        }
-
-            .box .row.header {
-                flex: 0 1 auto;
-                /* The above is shorthand for:
-                          flex-grow: 0,
-                          flex-shrink: 1,
-                          flex-basis: auto
-                          */
-            }
-
-            .box .row.content {
-                flex: 1 1 auto;
-            }
-
-            .box .row.footer {
-                flex: 0 1 40px;
-            }
-</style>
-
-
-
 
 
 @code {

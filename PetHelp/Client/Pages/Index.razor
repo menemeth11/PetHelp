@@ -17,7 +17,7 @@
 <PageTitle>Index</PageTitle>
 <div class="row w-100 m-0">
     <div class="col-12 col-md-6 wrapper p-0">
-        <div class="items-container" style="height:inherit;  overflow-y:scroll;">
+        <div class="items-container">
             <div class="p-4" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center;">
                 @foreach (HodowlaDTO item in Hodowle)
                 {
@@ -37,12 +37,12 @@
         <!-- Modal -->
         <div @ref="NewHodowlaModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-keyboard="false" id="staticBackdrop">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content" style="height:250px; border-radius:10px; border: 2px solid rgba(205,0,236,1);">
+                <div class="modal-content">
                     <div class="modal-body" style=" display: flex; flex-direction: column; justify-content: space-around;">
                         <div class="row mx-auto p-2">
                             <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                                  viewBox="0 0 496.491 496.491" style="enable-background:new 0 0 496.491 496.491;" xml:space="preserve"
-                                 height="125px" width="125px" fill="rgba(205,0,236,1)">
+                                 height="125px" width="125px" fill="#0A4A8D">
                             <g>
                             <path d="M245.204,326.125c-29.326,0-53.184,22.21-53.184,49.509c0,12.964,7.64,20.704,20.436,20.704
 		            c5.876,0,12.325-1.494,18.561-2.938c5.161-1.195,10.497-2.432,14.187-2.432c3.213,0,8.283,1.182,13.185,2.325
@@ -99,7 +99,7 @@
             @foreach (var item in Zwierzeta)
             {
                 <div @ref="Boxes[item]" class="slidebox px-3" @onclick="()=>GoToPetDetailsPage(item.Id)">
-                    <div class="rectangle-gradient box-row" style="box-shadow:2px 2px 4px rgba(238,130,238,.75)">
+                    <div class="list-element">
                         <div class="mx-3">
                             <span class="oi oi-magnifying-glass" style="font-size:32px;" />
                         </div>

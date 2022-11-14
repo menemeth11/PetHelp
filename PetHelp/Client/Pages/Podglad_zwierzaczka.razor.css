@@ -1,64 +1,177 @@
-﻿.round-gradient {
-    width: 4rem;
-    height: 4rem;
-    align-items: center;
-    background: linear-gradient( white,white) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    color: rgba(205,0,236,1);
-}
-
-    .round-gradient:hover {
-        background: linear-gradient(rgba(205,0,236,1), rgba(238,124,255,1)) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-        border: 0px solid transparent;
-        color: white;
-    }
-
-.rectangle-gradient {
-    width: auto;
-    padding: 0 1rem;
-    height: 3rem;
-    align-items: center;
-    background: linear-gradient( white,white) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-    border: 1px solid transparent;
-    border-radius: 10% 10%;
-    color: rgba(205,0,236,1);
-}
-
-    .rectangle-gradient:hover {
-        background: linear-gradient(rgba(205,0,236,1), rgba(238,124,255,1)) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-        border: 0px solid transparent;
-        color: white;
-    }
-
-.wrapper {
-    height: calc(100vh - 3.5rem);
+﻿.profile {
+    height: calc(100vh - 3.5rem - 51px);
     width: calc(100vw-250px);
     position: relative;
+    background: #cfcfcf;
+    padding-bottom: 24px
 }
 
-.bottom-right {
+.profile .wrapper {
+    height: calc(100% - 51px - 24px);
+    display: flex;
+    justify-content: left;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.profile-topnav {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    gap: 16px;
+    height: 51px;
+    background: #808080;
+    margin-bottom: 24px;
+}
+
+.profile-topnav h2 {
+    margin: 0;
+}
+
+.profile-bottomnav {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    gap: 16px;
+    height: 51px;
+    background: #808080;
+}
+
+.profile-avatar {
+    position: relative;
+    border: 5px solid #0A4A8D;
+    aspect-ratio: 1/1.5;
+    width: 25%;
+    background: #f00;
+    overflow: hidden;
+}
+
+.profile-avatar img{
     position: absolute;
-    right: 0;
+    height: 100%;
+    left:50%;
+    top: 0;
     bottom: 0;
-    margin: 1rem;
+    transform: translateX(-50%);
 }
 
-.cardContainer {
-    margin: .5rem;
-    padding: 0.5rem;
-    cursor: pointer;
-    border-radius: 10%;
-    background: linear-gradient(white,white) padding-box, linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(238,124,255,1) 65%, rgba(205,0,236,1) 100%) border-box;
-    color: rgba(205,0,236,1);
+.profile-column {
+    height: 100%;
+    background: rgba(131, 25, 129, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: calc(75% / 2);
 }
 
-    .cardContainer:hover {
-        font-weight: bolder;
+.profile-box {
+    background: #337dcb;
+}
+
+.profile-box-title {
+    padding: 0 24px;
+    text-align: center;
+    background: #0a4a8d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 51px;
+}
+
+    .profile-box-title h5 {
+        color: #FFF;
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0;
     }
 
-.text-clipped {
-    overflow: hidden;
-    width: auto;
-    text-overflow: ellipsis;
+.profile-box-body {
+    padding: 24px;
+    height: calc(100% - 51px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-box-body h5{
+    margin: 0;
+}
+
+
+    .profile-box article {
+        overflow-y: auto;
+        height: 100%;
+        overflow-x: hidden;
+        margin-bottom: 8px;
+    }
+
+    .profile-box article:last-of-type{
+        margin-bottom: 0;
+    }
+
+.profile-box article h5 {
+    margin-bottom: 16px;
+}
+
+        .profile-box article textarea {
+            width: 100%;
+            min-height: 125px;
+        }
+
+.profile .tabler {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+
+.profile .tabler .rower {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    border: 1px solid #fff;
+}
+
+.profile .tabler .rower .coler {
+    border: 1px solid #FFF;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 8px;
+}
+
+.profile .tabler .rower .coler_w25 {
+    width: 25%;
+}
+
+.profile .tabler .rower .coler_w50 {
+    width: 50%;
+}
+
+.profile .tabler .rower .subcol {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border: 0;
+}
+
+.profile .tabler .rower .subcol .coler {
+    width: 100%;
+}
+
+.box-choroby {
+    height: calc(100% - 247px - 24px);
+}
+
+.box-szczepienia {
+    height: 247px;
+}
+
+.box-dane {
+    height: calc(66.666% - 24px);
+}
+
+.box-dodatkowe {
+    height: 33.333%;
 }

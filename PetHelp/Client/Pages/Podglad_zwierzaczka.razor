@@ -9,143 +9,266 @@
 
 @inject IJSRuntime JS
 
-<h1>Detale zwierzaka</h1>
+<div class="profile">
 
-@if (zmiana)
-{
-    <InputFile OnChange="@LoadFile" title="Zmien zdjecie" />
-}
-<img src="@ZwierzeImageUrl" @onmouseover="@OnMouseOver" @onmouseout="@OnMouseOut"/>
+        <!-- Top navbar -->
+        <div class="profile-topnav">
+            <input type="button" value="Back to list" @onclick="BackToLiat" />
+        <h2>Detale zwierzaka: @zwierz.Imie</h2>
+        </div>
 
-<input type="button" value="Back to list" @onclick="BackToLiat" />
-Gatunek:
-@if (IsChanged)
-{
-    <input type="text" @bind="zwierz.Gatunek" />
-}
-else
-    @zwierz.Gatunek
+        <div class="wrapper">
+            <div class="profile-avatar">
+            
+                    @if (zmiana)
+                        {
+                <InputFile OnChange="@LoadFile" class="changer" title="Zmien zdjecie" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1;" />
+                        }
+            <img src="@ZwierzeImageUrl" @onmouseover="@OnMouseOver" @onmouseout="@OnMouseOut" />
+                        
+                    
+            </div>
 
-<br />
-Rasa:
-@zwierz.rasaNazwa
-<br />
-Imie:
-@if(IsChanged)
-{
-<input type="text" @bind="zwierz.Imie" />
-}
-else
-    @zwierz.Imie
+            <div class="profile-column">
+                <div class="profile-box box-dane">
+                    <div class="profile-box-title">
+                        <h5>Dane podstawowe:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <article>
+                            <div class="tabler">
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Gatunek
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    @if (IsChanged)
+                                    {
+                                        <input type="text" @bind="zwierz.Gatunek" />
+                                    }
+                                    else
+                                        @zwierz.Gatunek
 
-<br />
-Umaszczenie:
-@if (IsChanged)
-{
-    <input type="text" @bind="zwierz.Umaszczenie" />
-}
-else
-    @zwierz.Umaszczenie
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Rasa
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        @zwierz.rasaNazwa
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Imię
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    @if (IsChanged)
+                                    {
+                                        <input type="text" @bind="zwierz.Imie" />
+                                    }
+                                    else
+                                        @zwierz.Imie
 
-<br />
-Data pomiaru waga:
-@if (IsChanged)
-{
-    <input type="date" @bind="zwierz.Waga_Pomiar" />
-}
-else
-{
-    @(zwierz.Waga_Pomiar.HasValue ? @zwierz.Waga_Pomiar.Value.ToShortDateString(): "Brak daty")
-}
-<br />
-Waga:
-@if (IsChanged)
-{
-    <input type="number" @bind="zwierz.Waga_Wartosc" />
-}
-else
-    @zwierz.Waga_Wartosc
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Umaszczenie
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    @if (IsChanged)
+                                    {
+                                        <input type="text" @bind="zwierz.Umaszczenie" />
+                                    }
+                                    else
+                                        @zwierz.Umaszczenie
+                                    </div>
+                                </div>                                
+                                <div class="rower">
+                                    <div class="coler coler_w25">
+                                        Waga
+                                    </div>
+                                    <div class="coler subcol coler_w25">
+                                        <div class="coler">
+                                            Data pomiaru
+                                        </div>
+                                        <div class="coler">
+                                            @if (IsChanged)
+                                            {
+                                                <input type="date" @bind="zwierz.Waga_Pomiar" />
+                                            }
+                                            else
+                                            {
+                                                @(zwierz.Waga_Pomiar.HasValue ? @zwierz.Waga_Pomiar.Value.ToShortDateString() : "Brak daty")
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="coler coler_w50">
+                                       @if (IsChanged)
+                                        {
+                                            <input type="number" @bind="zwierz.Waga_Wartosc" />
+                                        }
+                                        else
+                                            @zwierz.Waga_Wartosc
 
-<br />
-Data urodzenia:
-@if (IsChanged)
-{
-    <input type="date" @bind="zwierz.DataUrodzenia" />
-}
-else
-    @zwierz.DataUrodzenia.ToShortDateString()
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w25">
+                                        Wiek
+                                    </div>
+                                    <div class="coler subcol coler_w25">
+                                        <div class="coler">
+                                            Data urodzenia
+                                        </div>
+                                        <div class="coler">
+                                        @if (IsChanged)
+                                        {
+                                            <input type="date" @bind="zwierz.DataUrodzenia" />
+                                        }
+                                        else
+                                            @zwierz.DataUrodzenia.ToShortDateString()
+                                    </div>
+                                </div>
+                                <div class="coler coler_w50">
+                                        1 rok
+                                    </div>
+                                </div>
+                                 <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Kastracja
+                                    </div>
+                                    <div class="coler coler_w50">
+                                        Kastracja:
+                                    @if (IsChanged)
+                                    {
+                                        <input type="checkbox" @bind="zwierz.Kastracja" />
+                                    }
+                                    else
+                                        @zwierz.Kastracja
+
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="profile-box box-dodatkowe">
+                    <div class="profile-box-title">
+                        <h5>Info dodatkowe:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <article>
+                        @if (IsChanged)
+                        {
+                            <textarea @bind="zwierz.Info_Dodatkowe" />
+                        }
+                        else
+                            @zwierz.Info_Dodatkowe
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-column">
+                
+                <div class="profile-box box-choroby">
+                    <div class="profile-box-title">
+                        <h5>Dane chorobowe:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <h5>Przebyte choroby</h5>
+                        <article>
+                        @if (IsChanged)
+                        {
+                            <textarea @bind="zwierz.Info_Choroby" />
+                        }
+                        else
+                            @zwierz.Info_Choroby
 
 
-<br />
-Kastracja:
-@if (IsChanged)
-{
-    <input type="checkbox" @bind="zwierz.Kastracja" />
-}
-else
-    @zwierz.Kastracja
-
-<br />
-Info Dodatkowe:
-@if (IsChanged)
-{
-    <input type="text" @bind="zwierz.Info_Dodatkowe" />
-}
-else
-    @zwierz.Info_Dodatkowe
-
-<br />
-Info Choroby:
-@if (IsChanged)
-{
-    <input type="text" @bind="zwierz.Info_Choroby" />
-}
-else
-    @zwierz.Info_Choroby
-
-<br />
-Info Schorzenia:
-@if (IsChanged)
-{
-    <input type="text" @bind="zwierz.Info_Schorzenia" />
-}
-else
-    @zwierz.Info_Schorzenia
-
-<br />
-
-Szczepienie Wscieklizna Data:
-@if (IsChanged)
-{
-    <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
-}
-else
-    @(zwierz.Szczepienie_Wscieklizna_Data.HasValue ? zwierz.Szczepienie_Wscieklizna_Data.Value.ToShortDateString() : "Brak daty")
-<br />
-Szczepienie Wscieklizna Status:
-@if (IsChanged)
-{
-    <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
-}
-else
-    @zwierz.Szczepienie_Wscieklizna_Status
-
-<br />
-Szczepienie Wscieklizna NastepnyTermin:
-@if (IsChanged)
-{
-    <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
-}
-else
-    @(zwierz.Szczepienie_Wscieklizna_NastepnyTermin.HasValue ? @zwierz.Szczepienie_Wscieklizna_NastepnyTermin.Value.ToShortDateString() : "Brak daty")
+                        </article>
+                        <h5>Aktualne Schorzenia</h5>
+                        <article>
+                        @if (IsChanged)
+                        {
+                            <textarea @bind="zwierz.Info_Schorzenia" />
+                        }
+                        else
+                            @zwierz.Info_Schorzenia
 
 
-<br />
+                        </article>
+                    </div>
+                </div>
 
-<input type="button" value="Edycja" @onclick="()=> IsChanged=true">
-<input type="button" value="Zapisz" @onclick="Aktualizuj">
-<input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
+                <div class="profile-box box-szczepienia">
+                    <div class="profile-box-title">
+                        <h5>Szczepienia:</h5>
+                    </div>
+                    <div class="profile-box-body">
+                        <article>
+                            <div class="tabler">
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Data szczepienia
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    @if (IsChanged)
+                                    {
+                                        <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
+                                    }
+                                    else
+                                        @(zwierz.Szczepienie_Wscieklizna_Data.HasValue ? zwierz.Szczepienie_Wscieklizna_Data.Value.ToShortDateString() : "Brak daty")
 
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Czy zaszczepiony
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    @if (IsChanged)
+                            {
+                                <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
+                            }
+                            else
+                                @zwierz.Szczepienie_Wscieklizna_Status
+                                    </div>
+                                </div>
+                                <div class="rower">
+                                    <div class="coler coler_w50">
+                                        Następny termin szczepienia
+                                    </div>
+                                    <div class="coler coler_w50">
+                                    @if (IsChanged)
+                                    {
+                                        <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
+                                    }
+                                    else
+                                        @(zwierz.Szczepienie_Wscieklizna_NastepnyTermin.HasValue ? @zwierz.Szczepienie_Wscieklizna_NastepnyTermin.Value.ToShortDateString() : "Brak daty")
+
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        </div>
+    
+        <!-- bottom nav -->
+        <div class="profile-bottomnav">
+            <input type="button" value="Edycja" @onclick="()=> IsChanged=true">
+            <input type="button" value="Zapisz" @onclick="Aktualizuj">
+            <input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
+        </div>
 
     @code {
     // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
