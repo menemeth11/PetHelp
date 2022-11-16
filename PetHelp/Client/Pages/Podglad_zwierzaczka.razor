@@ -1,6 +1,6 @@
 ﻿@page "/podglad/{ZwierzeId}"
 @using Newtonsoft.Json
-@using PetHelp.Client.Nowy_folder
+@using PetHelp.Client.States
 @using PetHelp.Shared.DTO
 @using System.Text.Json
 @inject HttpClient KlientHTTP
@@ -268,9 +268,10 @@
             <input type="button" value="Edycja" @onclick="()=> IsChanged=true">
             <input type="button" value="Zapisz" @onclick="Aktualizuj">
             <input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
+            <input type="button" value="Usuń" @onclick="Usun">
         </div>
 
-    @code {
+@code {
     // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
     [Parameter] public string ZwierzeId { get; set; }
     // page loacl property for html binding and use in code
@@ -312,7 +313,7 @@
                 _state.Zwierzeta[index] = zwierz;
             }
         }
-
+        _state.SelectedHodowlaId = zwierz.HodowlaId;
         // back to main page 'home'
         Navigation.NavigateTo("/Home");
     }
@@ -367,5 +368,15 @@
     {
 
 
+    }
+
+    private async Task Usun()
+    {
+        //wysłanie zapytanie do servera z miłą prośba o usuniecie zwierzątka <3 [*]
+        await KlientHTTP.DeleteAsync($"/home/usun/{zwierz.Id}");
+
+        //usunięcie stanu zwierzaka aby sienie pojawiał na strone => dalej jest w bazie
+        _state.Zwierzeta.Remove(_state.Zwierzeta.Find(x => x.Id == zwierz.Id));
+        Navigation.NavigateTo("/Home");
     }
 }

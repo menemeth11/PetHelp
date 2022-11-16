@@ -9,7 +9,9 @@ function checkBoxes(boxes) {
 
     const triggerBottom = window.innerHeight / 6 * 5;
 
+    console.log(boxes.Length);
     boxes.forEach((box) => {
+
         const boxTop = box.getBoundingClientRect().top;
 
         if (boxTop < triggerBottom) {

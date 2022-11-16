@@ -11,7 +11,7 @@
 
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Authorization
-@using PetHelp.Client.Nowy_folder
+@using PetHelp.Client.States
 @using PetHelp.Shared.DTO
 
 <PageTitle>Index</PageTitle>
@@ -34,6 +34,10 @@
 
         <!-- Button trigger modal -->
         <input type="button" class="round-gradient bottom-right shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" value="Dodaj" />
+        @if (SelectedHodowla > 0)
+        {
+            <input type="button" class="round-gradient bottom-right shadow" style="margin-right:100px!important" @onclick="@UsunH" value="Usuń" />
+        }
         <!-- Modal -->
         <div @ref="NewHodowlaModal" class="modal fade" tabindex="-1" aria-hidden="true" data-bs-keyboard="false" id="staticBackdrop">
             <div class="modal-dialog modal-dialog-centered">
@@ -95,7 +99,7 @@
         </div>
     </div>
     <div class="col-12 col-md-6 wrapper p-0">
-        <div class="box-container" @onscroll="CheckBoxes">
+        <div class="box-container" @onscroll="CheckBoxes" style="padding-bottom:100px;">
             @foreach (var item in Zwierzeta)
             {
                 <div @ref="Boxes[item]" class="slidebox px-3" @onclick="()=>GoToPetDetailsPage(item.Id)">
@@ -140,8 +144,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        // sprawdzenie czy jest to pierwsze renderowanie strony (metoda 'cyklu zycia strony' blazora)
         if (firstRender)
         {
+            // jezeli pierwszy raz ladujemy strone, zaimportujmy do jej pamięci skrypty js w celu latwego dostępu, przypisane zostana do zmiennej module
             try
             {
                 this.module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Index.razor.js");
@@ -151,25 +157,32 @@
                 Console.WriteLine($"Failed to load JS module. Error: {ex}");
             }
         }
-
+        //podczas odswierzenia strony wstepne zainicjowanie skryptu JS wykorzystanej do animacji listy zwierząt, ich wjazdu itp
         await CheckBoxes();
     }
 
     protected override async Task OnInitializedAsync()
     {
+        // standardowa autoryzacja uzytkownika ładującego strone
         var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        // wyciągnięcie ID użytkownika
         this.CurrentUserId = authstate.User.Claims.First(x => x.Type == "sub").Value;
+        //wysłanie żądania do serwera o pobranie listy hodowli posiadanych przez tego użytkwnika, poprzez sprecyzopwanie i przekazanie parametru  CurrentUserId
         var respond = await KlientHTTP.GetFromJsonAsync<List<HodowlaDTO>>($"Home/GetUserHodowla/{this.CurrentUserId}");
+        // spraadzenie czy dostalismy cokolwiek w odpowiedzi serwera
         if (respond != null)
         {
+            // zapisanie w pamieci strony listy hodowli uzytkownika
             this.Hodowle = respond;
         }
 
+        // zaktualizowanie pamieci strony o informacje aktualnie przechowywane w pamieci cache
         this.SelectedHodowla = _state.SelectedHodowlaId;
-        this.Zwierzeta = _state.Zwierzeta;
+        this.Zwierzeta = _state.Zwierzeta;     
     }
 
     private void Dodajzwierzaka(){
+        // przejście na strone dodawania zwierzaka, ze sprecyzowaniem dla jakiej hodowli zostaje dodany zwierzak przekazujac parametr SelectedHodowla
         Navigation.NavigateTo($"dodawanie/{SelectedHodowla}");
     }
 
@@ -182,42 +195,56 @@
         }
 
         HodowlaRequestDTO body = new()
-            {
-                Nazwa = NazwaHodowlil,
-                UserID = CurrentUserId
-            };
+        {
+            Nazwa = NazwaHodowlil,
+            UserID = CurrentUserId
+        };
 
+        // wysłanie zapytania POST zawierającego w sobie informacje hodowli, do serwera (chcemy utworzyc nową hodowle na serwerze, bazie sql)
         var respond = await KlientHTTP.PostAsJsonAsync<HodowlaRequestDTO>($"Home/Dodajhodowle", body);
 
+        // upewniamy sie ze dostalismy odpowiedz, czy żądanie nie było niepoprawne
         if (respond.IsSuccessStatusCode == false)
         {
             // Błąd odpowiedzi ze ztrony serwera
             return;
         }
 
+        // ładujemy otrzymane informacje z serwera zawierające nowoutworzoną hodowle w tym jej id ( klucz głóny w tabeli/sql) 
+        // istnieje ryzyko ze serwer nie zwróci nam wartości, dlatego HodowlaDTO? <- może być puste
         HodowlaDTO? result = await respond.Content.ReadFromJsonAsync<HodowlaDTO>();
 
+
+        // Obiekt hodowli z serwera jest pusty,
         if (result == null)
         {
-            // Obiekt hodowli jest pusty
             return;
         }
 
+        // gdy dostalismy poprawna odpowiedz i zaladowalismy hodowle (result), dodajemy ją do pamięci strony i jej zmiennej Hodowle, która przetrzymuje Liste HodowlaDTO ( pozwoli nam wyświetlic je na stronie html)
         Hodowle.Add(result);
+        // zapisanie do pamięci strony i zmiennej SelectedHodowla ( odpowiedzialna za pokazywanie si eprzycisku dodawania zwierząto do chodowli)()
         SelectedHodowla = result.Id;
 
+        //uzycie skryptu JS do zaladowania listy zwierząt i jej animacje efektu scrolowania i slide itp..
+        await LoadAnimals(result.Id);
+        // pomyślnie wykonane wszystkie operacje,hodowla dodana, zamykamy aktualnie używane okno dialogowe( referencja zmiennej: NewHodowlaModal)
         await HideModal(this.NewHodowlaModal);
+        NazwaHodowlil = "";
     }
 
     private async Task HideModal(ElementReference modal)
     {
+        // przechwycenie ewentualnego błędu podczas użycia skryptów js w razie gdyby nie były zaimportowane do pamięci strony (zmienna: module)
         try
         {
+            // jeżeli jakiekolwiek skrypty są załądowane , wykonaj skrypt zamykania aktualnie otwartego okienka dialogowego (referencja do zmiennej: modal)
             if (module is not null)
                 await module.InvokeVoidAsync("hideModal", modal);
         }
         catch (Exception ex)
         {
+            // w przypadku błędu zamiast wyświetlać error, zostanie wypisany test w konsoli 
             Console.WriteLine($"Failed to execute JS function. Error: {ex}");
         }
     }
@@ -226,61 +253,57 @@
 
     private async Task LoadAnimals(int hodowlaId)
     {
+        // zapisanie id hodowli zeby dokonac zmian w UI ( pogrubienie tekstu + ramka )
         this.SelectedHodowla = hodowlaId;
-        this.Boxes.Clear(); // wyczyszczenie starcyh bobiektor @ref z pamieci
-        var respond = await KlientHTTP.GetFromJsonAsync<List<ZwierzeDTO>>($"Home/GetZwierzetaByHodowla/{hodowlaId}");
-        if (respond != null)
+        // jezeli cofamy sie na ostatnio wybrana hodowle (np po dodaniu zwierzaka), nie pobieramy ponownie zwierzakow z serwera, tylko uzywamy state`a który juz wczesniej przetrzymywał liste zwierząt , tym sposobem ograniczamy obciążenie serwera , zmniejszamy liczbe zapytań
+        if(_state.SelectedHodowlaId != hodowlaId) 
         {
-            this.Zwierzeta = respond;
+            var respond = await KlientHTTP.GetFromJsonAsync<List<ZwierzeDTO>>($"Home/GetZwierzetaByHodowla/{hodowlaId}");
+            if (respond != null) 
+            {
+                // załadowanie do pamięci strony zwierząt otrzymanych w odpowiedzi serwera
+                this.Zwierzeta = respond;
+                // zaktualizowanie cache przechowującego liste zwierząt o dane pobrane z serwera , w celu ich póżniejszego łatwego/szybkiego wykoprzystania
+                _state.Zwierzeta = respond;
+            }
+        } 
+        else
+        {
+            // zaladowanie do pamięci strony listy zwierząt aktualinie przechowywanej w cache (StateManager.cs)
+            this.Zwierzeta = _state.Zwierzeta;
         }
-        StateHasChanged();
-        await CheckBoxes();
-    }
-
-    public async Task CheckBoxes()
-    {
-        await module.InvokeVoidAsync("checkBoxes", Boxes.Values);
+        this.Boxes.Clear(); // wyczyszczenie starcyh bobiektor @ref z pamieci (uzywane do poprawnego dzialania skryptu js)
     }
 
     private void GoToPetDetailsPage(int petId)
     {
-        _state.SelectedHodowlaId = this.SelectedHodowla;
-        _state.Zwierzeta = this.Zwierzeta;
+        // niepotrzebne, łądujemy juz dane do cache w metodzie loadAnimals , wykonywanej w czasie wybierania hodowli
+        ////_state.SelectedHodowlaId = this.SelectedHodowla;
+        ////_state.Zwierzeta = this.Zwierzeta;
 
+        // przejście do strony szczegółów danego zwierzęcia, z wybranym id (petID) 
         Navigation.NavigateTo($"podglad/{petId}");
-        /*
-        * // Zapisanie aktualnego stanu strony w pamieci ? zeby nie ladowac tego samego ponownie przy powrocie
-        * public class StateManager {
-        *   public int SelectedHodowlaId {get;set;}
-        *   public List<ZwierzeDTO> Zwierzeta {get;set;}
-        * }
-        */
-
-        /*
-        * // zarejestrowanie singletona sluzaczego nam jako pamiec wewnetrzna
-        * builder.Services.AddSingleton<StateManager>();
-        */
-
-        /*
-        * // import singletona na stronie
-        *  @inject StateManager _state;
-        */
-
-        /*
-        * // przy wychodzeniu ze strony, zapisanie w pamieci niebednych danych
-        * _state.SelectedHodowlaId = this.SelectedHodowla;
-        * _state.Zwierzeta = this.Zwierzeta;
-        */
-
-        /*
-        * // przy ładowaniu strony, importujemy stan z stateManagera w OnInitialized tzn na starcie ladowania sie strony
-        * this.SelectedHodowla = _state.SelectedHodowlaId;
-        * this.Zwierzeta = _state.Zwierzeta;
-        */
-
     }
 
+    private async Task UsunH()
+    {
+        await KlientHTTP.DeleteAsync($"/home/UsunHodowle/{SelectedHodowla}");
+        Hodowle.Remove(Hodowle.Find(x => x.Id == SelectedHodowla));
+        _state.SelectedHodowlaId = -1;
+        SelectedHodowla = -1;
+        Zwierzeta.Clear();
+        Boxes.Clear();
+        StateHasChanged();
+    }
 
+ // ------------ UI, JS, safe to comment ----------------------
+    public async Task CheckBoxes()
+    {
+        //odpalenie skryptu js odświeżającego animacje wjazdu boxów (kontenerów z infomacjami o hodowli ) niezbędne tylko dla UI
+        if(Boxes != null && Boxes.Count > 0){
+            await module.InvokeVoidAsync("checkBoxes", Boxes.Values);
+        }
+    }
 }
 
 
