@@ -46,6 +46,7 @@
     width: 25%;
     background: #f00;
     overflow: hidden;
+    margin-left: 20px;
 }
 
 .profile-avatar img{
