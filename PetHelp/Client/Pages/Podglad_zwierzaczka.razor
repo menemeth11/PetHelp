@@ -13,59 +13,85 @@
 
 <div class="profile">
 
-        <!-- Top navbar -->
-        <div class="profile-topnav">
-            <input type="button" value="Back to list" @onclick="BackToLiat" />
+    <!-- Top navbar -->
+    <div class="profile-topnav">
+        <input type="button" value="Back to list" @onclick="BackToLiat" />
         <h2>Detale zwierzaka: @zwierz.Imie</h2>
+    </div>
+
+    <div class="wrapper">
+        <div class="profile-avatar">
+            <img class="@(EditMode?"imgHoverUpload":"")" src="@ZwierzeImageUrl" @onclick="HandleClick" @onmouseout="@OnMouseOut" @onmouseover="@OnMouseOver" />
+            @if (_IsHovering && EditMode)
+            {
+                <img class="upload-image" src="svg/add-image-svgrepo-com.svg" alt="upload image" />
+
+            }
+            @if (EditMode)
+            {
+                <InputFile id="uploadBtn1" OnChange="@LoadFile" style="display:none;" />
+            }
         </div>
 
-        <div class="wrapper">
-            <div class="profile-avatar">
-            
-                    @if (zmiana)
-                        {
-                <InputFile OnChange="@LoadFile" class="changer" title="Zmien zdjecie" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1;" />
-                        }
-            <img src="@ZwierzeImageUrl" @onmouseover="@OnMouseOver" @onmouseout="@OnMouseOut" />
-                        
-                    
-            </div>
-
-            <div class="profile-column">
-                <div class="profile-box box-dane">
-                    <div class="profile-box-title">
-                        <h5>Dane podstawowe:</h5>
-                    </div>
-                    <div class="profile-box-body">
-                        <article>
-                            <div class="tabler">
-                                <div class="rower">
-                                    <div class="coler coler_w50">
-                                        Gatunek
-                                    </div>
-                                    <div class="coler coler_w50">
-                                        @zwierz.Gatunek
-                                    </div>
+        <div class="profile-column">
+            <div class="profile-box box-dane">
+                <div class="profile-box-title">
+                    <h5>Dane podstawowe:</h5>
+                </div>
+                <div class="profile-box-body">
+                    <article>
+                        <div class="tabler">
+                            <div class="rower">
+                                <div class="coler coler_w50">
+                                    Gatunek
                                 </div>
-                                <div class="rower">
-                                    <div class="coler coler_w50">
-                                        Rasa
-                                    </div>
-                                    <div class="coler coler_w50">
-                                        @zwierz.rasaNazwa
-                                    </div>
+                                <div class="coler coler_w50">
+                                    @zwierz.Gatunek
                                 </div>
-                                <div class="rower">
-                                    <div class="coler coler_w50">
-                                        Imię
-                                    </div>
-                                    <div class="coler coler_w50">
-                                    @if (IsChanged)
+                            </div>
+                            <div class="rower">
+                                <div class="coler coler_w50">
+                                    Rasa
+                                </div>
+                                <div class="coler coler_w50">
+                                    @zwierz.rasaNazwa
+                                </div>
+                            </div>
+                            <div class="rower">
+                                <div class="coler coler_w50">
+                                    Imię
+                                </div>
+                                <div class="coler coler_w50">
+                                    @if (EditMode)
                                     {
                                         <input type="text" @bind="zwierz.Imie" />
                                     }
                                     else
                                         @zwierz.Imie
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                                     </div>
                                 </div>
@@ -74,14 +100,39 @@
                                         Umaszczenie
                                     </div>
                                     <div class="coler coler_w50">
-                                    @if (IsChanged)
+                                        @if (EditMode)
                                     {
                                         <input type="text" @bind="zwierz.Umaszczenie" />
                                     }
                                     else
                                         @zwierz.Umaszczenie
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                     </div>
-                                </div>                                
+                                </div>
                                 <div class="rower">
                                     <div class="coler coler_w25">
                                         Waga
@@ -91,23 +142,47 @@
                                             Data pomiaru
                                         </div>
                                         <div class="coler">
-                                            @if (IsChanged)
-                                            {
-                                                <input type="date" @bind="zwierz.Waga_Pomiar" />
-                                            }
-                                            else
-                                            {
-                                                @(zwierz.Waga_Pomiar.HasValue ? @zwierz.Waga_Pomiar.Value.ToShortDateString() : "Brak daty")
-                                            }
-                                        </div>
-                                    </div>
-                                    <div class="coler coler_w50">
-                                       @if (IsChanged)
+                                            @if (EditMode)
                                         {
-                                            <input type="number" @bind="zwierz.Waga_Wartosc" />
+                                            <input type="date" @bind="zwierz.Waga_Pomiar" />
                                         }
                                         else
-                                            @zwierz.Waga_Wartosc
+                                        {
+                                            @(zwierz.Waga_Pomiar.HasValue ? @zwierz.Waga_Pomiar.Value.ToShortDateString() : "Brak daty")
+                                        }
+                                    </div>
+                                </div>
+                                <div class="coler coler_w50">
+                                    @if (EditMode)
+                                    {
+                                        <input type="number" @bind="zwierz.Waga_Wartosc" />
+                                    }
+                                    else
+                                        @zwierz.Waga_Wartosc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                                     </div>
                                 </div>
@@ -120,30 +195,79 @@
                                             Data urodzenia
                                         </div>
                                         <div class="coler">
-                                        @if (IsChanged)
+                                            @if (EditMode)
                                         {
                                             <input type="date" @bind="zwierz.DataUrodzenia" />
                                         }
                                         else
                                             @zwierz.DataUrodzenia.ToShortDateString()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="coler coler_w50">
+                                    <div class="coler coler_w50">
                                         1 rok
                                     </div>
                                 </div>
-                                 <div class="rower">
+                                <div class="rower">
                                     <div class="coler coler_w50">
                                         Kastracja
                                     </div>
                                     <div class="coler coler_w50">
                                         Kastracja:
-                                    @if (IsChanged)
+                                        @if (EditMode)
                                     {
                                         <input type="checkbox" @bind="zwierz.Kastracja" />
                                     }
                                     else
                                         @zwierz.Kastracja
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                                     </div>
                                 </div>
@@ -158,12 +282,36 @@
                     </div>
                     <div class="profile-box-body">
                         <article>
-                        @if (IsChanged)
+                            @if (EditMode)
                         {
                             <textarea @bind="zwierz.Info_Dodatkowe" />
                         }
                         else
                             @zwierz.Info_Dodatkowe
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                         </article>
                     </div>
@@ -171,7 +319,7 @@
             </div>
 
             <div class="profile-column">
-                
+
                 <div class="profile-box box-choroby">
                     <div class="profile-box-title">
                         <h5>Dane chorobowe:</h5>
@@ -179,7 +327,7 @@
                     <div class="profile-box-body">
                         <h5>Przebyte choroby</h5>
                         <article>
-                        @if (IsChanged)
+                            @if (EditMode)
                         {
                             <textarea @bind="zwierz.Info_Choroby" />
                         }
@@ -187,15 +335,61 @@
                             @zwierz.Info_Choroby
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                         </article>
                         <h5>Aktualne Schorzenia</h5>
                         <article>
-                        @if (IsChanged)
+                            @if (EditMode)
                         {
                             <textarea @bind="zwierz.Info_Schorzenia" />
                         }
                         else
                             @zwierz.Info_Schorzenia
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                         </article>
@@ -214,26 +408,75 @@
                                         Data szczepienia
                                     </div>
                                     <div class="coler coler_w50">
-                                    @if (IsChanged)
+                                        @if (EditMode)
                                     {
                                         <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
                                     }
                                     else
                                         @(zwierz.Szczepienie_Wscieklizna_Data.HasValue ? zwierz.Szczepienie_Wscieklizna_Data.Value.ToShortDateString() : "Brak daty")
 
-                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                 </div>
-                                <div class="rower">
-                                    <div class="coler coler_w50">
-                                        Czy zaszczepiony
-                                    </div>
-                                    <div class="coler coler_w50">
-                                    @if (IsChanged)
-                            {
-                                <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
-                            }
-                            else
-                                @zwierz.Szczepienie_Wscieklizna_Status
+                            </div>
+                            <div class="rower">
+                                <div class="coler coler_w50">
+                                    Czy zaszczepiony
+                                </div>
+                                <div class="coler coler_w50">
+                                    @if (EditMode)
+                                    {
+                                        <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
+                                    }
+                                    else
+                                        @zwierz.Szczepienie_Wscieklizna_Status
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                     </div>
                                 </div>
                                 <div class="rower">
@@ -241,32 +484,56 @@
                                         Następny termin szczepienia
                                     </div>
                                     <div class="coler coler_w50">
-                                    @if (IsChanged)
+                                        @if (EditMode)
                                     {
                                         <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_NastepnyTermin" />
                                     }
                                     else
                                         @(zwierz.Szczepienie_Wscieklizna_NastepnyTermin.HasValue ? @zwierz.Szczepienie_Wscieklizna_NastepnyTermin.Value.ToShortDateString() : "Brak daty")
 
-                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                 </div>
                             </div>
-                        </article>
-                    </div>
+                        </div>
+                    </article>
                 </div>
             </div>
-            </div>
+        </div>
+    </div>
 
-        </div>
-    
-        <!-- bottom nav -->
-        <div class="profile-bottomnav">
-            <input type="button" value="Edycja" @onclick="()=> IsChanged=true">
-            <input type="button" value="Zapisz" @onclick="Aktualizuj">
-            <input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
-            <input type="button" value="Usuń" @onclick="Usun">
-            <input type="button" value="Pobierz" @onclick="Pobierz">
-        </div>
+</div>
+
+<!-- bottom nav -->
+<div class="profile-bottomnav">
+    <input type="button" value="Edycja" @onclick="()=> EditMode=true">
+    <input type="button" value="Zapisz" @onclick="Aktualizuj">
+    <input type="button" value="cofnij zmiany" disabled="@(!EditMode)" @onclick="UndoChanges">
+    <input type="button" value="Usuń" @onclick="Usun">
+    <input type="button" value="Pobierz" @onclick="Pobierz">
+</div>
 
 @code {
     // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
@@ -274,11 +541,22 @@
     // page loacl property for html binding and use in code
     private ZwierzeDTO zwierz { get; set; } = new();
     // property for keep track of current Zwierz state if its changed or no (used in undo-rever button)
-    private bool IsChanged { get; set; } = false;
-    private bool zmiana { get; set; } = false;
+    private bool EditMode { get; set; } = false;
     // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
     private string _source_Json { get; set; }
     private long maxFileSize = 5 * 1024 * 1024;
+
+    string ZwierzeImageUrl
+    {
+        get
+        {
+            if (zwierz.Zdjecie_Data.Length == 0)
+                return "/img/cat-placeholder.jpg";
+
+            return $"data:{zwierz.Zdjecie_MIME};base64,{Convert.ToBase64String(zwierz.Zdjecie_Data)}";
+        }
+    }
+    IJSObjectReference? module { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -297,7 +575,7 @@
     private void BackToLiat()
     {
         // check if any changes occurs in this page
-        if (IsChanged)
+        if (EditMode)
         {
             // find what index (if object exist, otherwise '-1') have current edited zwierzeDTO in cached list
             int index = _state.Zwierzeta.FindIndex(x => x.Id == zwierz.Id);
@@ -314,6 +592,21 @@
         // back to main page 'home'
         Navigation.NavigateTo("/Home");
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                this.module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/Podglad_zwierzaczka.razor.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load JS module. Error: {ex}");
+            }
+        }
+    }
     private async Task Aktualizuj()
     {
 
@@ -323,8 +616,8 @@
         ZwierzeDTO stary = _state.Zwierzeta.Where(x => x.Id == zwierz.Id).First();
         int index = _state.Zwierzeta.IndexOf(stary);
         _state.Zwierzeta[index] = zwierz;
-        IsChanged = false;
-        zmiana = false;
+        EditMode = false;
+        EditMode = false;
     }
     private async Task UndoChanges()
     {
@@ -333,7 +626,7 @@
         // send to server old version to revert changes
         var result = await KlientHTTP.PostAsJsonAsync<ZwierzeDTO?>($"Home/AktualizujZwierze", zwierz);
         // change this page state 'is changed' to false, data back to orginal from before any modifications
-        IsChanged = false;
+        EditMode = false;
     }
 
     private async Task LoadFile(InputFileChangeEventArgs e)
@@ -342,29 +635,8 @@
         zwierz.Zdjecie_Name = e.File.Name;
         using var file = new StreamContent(e.File.OpenReadStream(maxFileSize));
         zwierz.Zdjecie_Data = await file.ReadAsByteArrayAsync();
-        zmiana = false;
+        EditMode = false;
         StateHasChanged();
-    }
-
-    string ZwierzeImageUrl
-    {
-        get
-        {
-            if (zwierz.Zdjecie_Data.Length == 0) return "/Images/No-Image.png";
-            return $"data:{zwierz.Zdjecie_MIME};base64,{Convert.ToBase64String(zwierz.Zdjecie_Data)}";           
-        }
-    }
-
-    private async Task OnMouseOver()
-    {
-        if(IsChanged)
-            zmiana = true;
-    }
-
-    private async Task OnMouseOut()
-    {
-
-
     }
 
     private async Task Usun()
@@ -384,5 +656,30 @@
         //await JS.InvokeVoidAsync("saveAsFile", "Export_Zwierzaczka.txt", Convert.ToBase64String(chuj));
         string y = (zwierz.Zdjecie_MIME.Split("/")[1]);
         await JS.InvokeVoidAsync("saveAsFile", $"Export_Zwierzaczka.{y}", Convert.ToBase64String(zwierz.Zdjecie_Data));
+    }
+
+    bool _IsHovering = false;
+
+    protected void OnMouseOver(MouseEventArgs mouseEvent)
+    {
+        if (!_IsHovering)
+        {
+            _IsHovering = true;
+            StateHasChanged();
+        }
+    }
+    protected void OnMouseOut(MouseEventArgs mouseEvent)
+    {
+        _IsHovering = false;
+        StateHasChanged();
+    }
+    private async void HandleClick()
+    {
+        if (!EditMode) return;
+
+        if (module is not null)
+        {
+            await this.module.InvokeVoidAsync("triggerButton", "uploadBtn1");
+        }
     }
 }

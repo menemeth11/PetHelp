@@ -45,7 +45,6 @@
     border: 5px solid #0A4A8D;
     aspect-ratio: 1/1.5;
     width: 25%;
-    background: #f00;
     overflow: hidden;
     margin-left: 20px;
 }
@@ -58,6 +57,22 @@
         bottom: 0;
         transform: translateX(-50%);
     }
+
+img.imgHoverUpload:hover {
+    filter: blur(15px) grayscale(1) brightness(50%);
+    cursor: pointer;
+    z-index: 1;
+}
+
+.upload-image {
+    left: 25%;
+    top: 25%;
+    height: 50%;
+    width: 50%;
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+}
 
 .profile-column {
     height: 100%;
