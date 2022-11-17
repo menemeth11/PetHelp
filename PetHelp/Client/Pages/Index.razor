@@ -121,10 +121,10 @@
             }
         </div>
 
-        @if (SelectedHodowla >0)
+        @if (SelectedHodowla > 0)
         {
             <!--Button trigger modal -->
-        <input type="button" class="round-gradient bottom-right shadow" @onclick="Dodajzwierzaka" value="Dodaj" />
+            <input type="button" class="round-gradient bottom-right shadow" @onclick="Dodajzwierzaka" value="Dodaj" />
         }
     </div>
 </div>
@@ -178,10 +178,11 @@
 
         // zaktualizowanie pamieci strony o informacje aktualnie przechowywane w pamieci cache
         this.SelectedHodowla = _state.SelectedHodowlaId;
-        this.Zwierzeta = _state.Zwierzeta;     
+        this.Zwierzeta = _state.Zwierzeta;
     }
 
-    private void Dodajzwierzaka(){
+    private void Dodajzwierzaka()
+    {
         // przejście na strone dodawania zwierzaka, ze sprecyzowaniem dla jakiej hodowli zostaje dodany zwierzak przekazujac parametr SelectedHodowla
         Navigation.NavigateTo($"dodawanie/{SelectedHodowla}");
     }
@@ -195,10 +196,10 @@
         }
 
         HodowlaRequestDTO body = new()
-        {
-            Nazwa = NazwaHodowlil,
-            UserID = CurrentUserId
-        };
+            {
+                Nazwa = NazwaHodowlil,
+                UserID = CurrentUserId
+            };
 
         // wysłanie zapytania POST zawierającego w sobie informacje hodowli, do serwera (chcemy utworzyc nową hodowle na serwerze, bazie sql)
         var respond = await KlientHTTP.PostAsJsonAsync<HodowlaRequestDTO>($"Home/Dodajhodowle", body);
@@ -210,7 +211,7 @@
             return;
         }
 
-        // ładujemy otrzymane informacje z serwera zawierające nowoutworzoną hodowle w tym jej id ( klucz głóny w tabeli/sql) 
+        // ładujemy otrzymane informacje z serwera zawierające nowoutworzoną hodowle w tym jej id ( klucz głóny w tabeli/sql)
         // istnieje ryzyko ze serwer nie zwróci nam wartości, dlatego HodowlaDTO? <- może być puste
         HodowlaDTO? result = await respond.Content.ReadFromJsonAsync<HodowlaDTO>();
 
@@ -244,7 +245,7 @@
         }
         catch (Exception ex)
         {
-            // w przypadku błędu zamiast wyświetlać error, zostanie wypisany test w konsoli 
+            // w przypadku błędu zamiast wyświetlać error, zostanie wypisany test w konsoli
             Console.WriteLine($"Failed to execute JS function. Error: {ex}");
         }
     }
@@ -256,17 +257,17 @@
         // zapisanie id hodowli zeby dokonac zmian w UI ( pogrubienie tekstu + ramka )
         this.SelectedHodowla = hodowlaId;
         // jezeli cofamy sie na ostatnio wybrana hodowle (np po dodaniu zwierzaka), nie pobieramy ponownie zwierzakow z serwera, tylko uzywamy state`a który juz wczesniej przetrzymywał liste zwierząt , tym sposobem ograniczamy obciążenie serwera , zmniejszamy liczbe zapytań
-        if(_state.SelectedHodowlaId != hodowlaId) 
+        if (_state.SelectedHodowlaId != hodowlaId)
         {
             var respond = await KlientHTTP.GetFromJsonAsync<List<ZwierzeDTO>>($"Home/GetZwierzetaByHodowla/{hodowlaId}");
-            if (respond != null) 
+            if (respond != null)
             {
                 // załadowanie do pamięci strony zwierząt otrzymanych w odpowiedzi serwera
                 this.Zwierzeta = respond;
                 // zaktualizowanie cache przechowującego liste zwierząt o dane pobrane z serwera , w celu ich póżniejszego łatwego/szybkiego wykoprzystania
                 _state.Zwierzeta = respond;
             }
-        } 
+        }
         else
         {
             // zaladowanie do pamięci strony listy zwierząt aktualinie przechowywanej w cache (StateManager.cs)
@@ -281,7 +282,7 @@
         ////_state.SelectedHodowlaId = this.SelectedHodowla;
         ////_state.Zwierzeta = this.Zwierzeta;
 
-        // przejście do strony szczegółów danego zwierzęcia, z wybranym id (petID) 
+        // przejście do strony szczegółów danego zwierzęcia, z wybranym id (petID)
         Navigation.NavigateTo($"podglad/{petId}");
     }
 
@@ -296,11 +297,12 @@
         StateHasChanged();
     }
 
- // ------------ UI, JS, safe to comment ----------------------
+    // ------------ UI, JS, safe to comment ----------------------
     public async Task CheckBoxes()
     {
         //odpalenie skryptu js odświeżającego animacje wjazdu boxów (kontenerów z infomacjami o hodowli ) niezbędne tylko dla UI
-        if(Boxes != null && Boxes.Count > 0){
+        if (Boxes != null && Boxes.Count > 0)
+        {
             await module.InvokeVoidAsync("checkBoxes", Boxes.Values);
         }
     }
