@@ -3,6 +3,8 @@
 @using PetHelp.Client.States
 @using PetHelp.Shared.DTO
 @using System.Text.Json
+@using System.Text
+
 @inject HttpClient KlientHTTP
 @inject NavigationManager Navigation
 @inject StateManager _state;
@@ -269,6 +271,7 @@
             <input type="button" value="Zapisz" @onclick="Aktualizuj">
             <input type="button" value="cofnij zmiany" disabled="@(!IsChanged)" @onclick="UndoChanges">
             <input type="button" value="Usuń" @onclick="Usun">
+            <input type="button" value="Pobierz" @onclick="Pobierz">
         </div>
 
 @code {
@@ -378,5 +381,14 @@
         //usunięcie stanu zwierzaka aby sienie pojawiał na strone => dalej jest w bazie
         _state.Zwierzeta.Remove(_state.Zwierzeta.Find(x => x.Id == zwierz.Id));
         Navigation.NavigateTo("/Home");
+    }
+
+    private async Task Pobierz()
+    {
+        //string x = $"Imie: {zwierz.Imie} \nRasa: {zwierz.rasaNazwa} \nData urodzenia: {zwierz.DataUrodzenia.ToShortDateString()}";
+        //var chuj = Encoding.UTF8.GetBytes(x);
+        //await JS.InvokeVoidAsync("saveAsFile", "Export_Zwierzaczka.txt", Convert.ToBase64String(chuj));
+        string y = (zwierz.Zdjecie_MIME.Split("/")[1]);
+        await JS.InvokeVoidAsync("saveAsFile", $"Export_Zwierzaczka.{y}", Convert.ToBase64String(zwierz.Zdjecie_Data));
     }
 }
