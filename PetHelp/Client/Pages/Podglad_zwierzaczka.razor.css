@@ -23,6 +23,7 @@
     height: 51px;
     background: #808080;
     margin-bottom: 24px;
+    color: white;
 }
 
 .profile-topnav h2 {
@@ -60,7 +61,7 @@
 
 .profile-column {
     height: 100%;
-    background: rgba(131, 25, 129, 0.2);
+    background: #cfcfcf;
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -94,6 +95,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    color: white;
 }
 
 .profile-box-body h5{
@@ -175,4 +177,8 @@
 
 .box-dodatkowe {
     height: 33.333%;
+}
+
+.tabler{
+    color: white;
 }

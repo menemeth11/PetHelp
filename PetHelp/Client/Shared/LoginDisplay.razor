@@ -6,14 +6,49 @@
 
 <AuthorizeView>
     <Authorized>
-        <a href="authentication/profile">Cześć, @context.User.Identity?.Name!</a>
-        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Wyloguj</button>
+        <button class="nav-link btn btn-link pet-help-button" href="">Pet-help</button>
+        <div class="w-100"></div>
+        <button class="nav-link btn btn-link pet-help-button-top" href="authentication/profile">Cześć, @context.User.Identity?.Name!</button>
+        <button class="nav-link btn btn-link pet-help-button-top" @onclick="BeginSignOut">Wyloguj</button>
     </Authorized>
     <NotAuthorized>
         <a href="authentication/register">Zarejestruj się</a>
         <a href="authentication/login">Zaloguj się</a>
     </NotAuthorized>
 </AuthorizeView>
+
+<style>
+    .pet-help-button{
+        color: white;
+        font-size: 22px;
+        background: transparent;
+        border: none;    
+    }
+
+    .pet-help-button:hover {
+        text-decoration: none !important;
+        color: white;
+    }
+
+        .pet-help-button:focus {
+            color: white;
+            box-shadow: none;
+            text-shadow: none;
+        }
+
+
+    .pet-help-button-top{
+        color:white !important;
+        border: 1px solid white;
+        background: #337DCB;
+        text-decoration: none;
+    }
+
+    .pet-help-button-top:hover{
+        text-decoration: none !important;
+        background: #2D6FB5;
+    }
+</style>
 
 @code{
     private async Task BeginSignOut(MouseEventArgs args)
