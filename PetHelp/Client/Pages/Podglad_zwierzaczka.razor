@@ -130,7 +130,7 @@
                                     </div>
                                 </div>
                                 <div class="coler coler_w50">
-                                    1 rok
+                                    @GetFormattedAgeString(zwierz.DataUrodzenia)
                                 </div>
                             </div>
                             <div class="rower">
@@ -277,6 +277,7 @@
     private bool EditMode { get; set; } = false;
     // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
     private string _source_Json { get; set; }
+    private string dupa = "";
     private long maxFileSize = 5 * 1024 * 1024;
     string ZwierzeImageUrl
     {
@@ -377,11 +378,11 @@
     }
     private async Task Pobierz()
     {
-        //string x = $"Imie: {zwierz.Imie} \nRasa: {zwierz.rasaNazwa} \nData urodzenia: {zwierz.DataUrodzenia.ToShortDateString()}";
-        //var chuj = Encoding.UTF8.GetBytes(x);
-        //await JS.InvokeVoidAsync("saveAsFile", "Export_Zwierzaczka.txt", Convert.ToBase64String(chuj));
-        string y = (zwierz.Zdjecie_MIME.Split("/")[1]);
-        await JS.InvokeVoidAsync("saveAsFile", $"Export_Zwierzaczka.{y}", Convert.ToBase64String(zwierz.Zdjecie_Data));
+        string x = $"Imie: {zwierz.Imie} \nRasa: {zwierz.rasaNazwa} \nWiek: {GetFormattedAgeString(zwierz.DataUrodzenia)} \nWaga: {zwierz.Waga_Wartosc}\nKastracja: {zwierz.Kastracja}\nSzczepienie: {zwierz.Szczepienie_Wscieklizna_Status}\nInformacje dodatkowe: {zwierz.Info_Dodatkowe}";
+        var wBytes = Encoding.UTF8.GetBytes(x);
+        await JS.InvokeVoidAsync("saveAsFile", $"Export_{zwierz.Imie}.txt", Convert.ToBase64String(wBytes));
+        //string y = (zwierz.Zdjecie_MIME.Split("/")[1]);
+        //await JS.InvokeVoidAsync("saveAsFile", $"Export_Zwierzaczka.{y}", Convert.ToBase64String(zwierz.Zdjecie_Data));
     }
     bool _IsHovering = false;
     protected void OnMouseOver(MouseEventArgs mouseEvent)
@@ -404,5 +405,56 @@
         {
             await this.module.InvokeVoidAsync("triggerButton", "uploadBtn1");
         }
+    }
+    public static string GetFormattedAgeString(DateTime _bDay, DateTime _day = default)
+    {
+        if (_day == default) _day = DateTime.Now;
+
+        int? rok_int = null, miesiac_int = null, dzien_int = null;
+        string? rok_string = null, miesiac_string = null, dzien_string = null;
+        var difference = _day - _bDay;
+        DateTime age = new DateTime().Add(difference);
+
+        if (age.Year - 1 > 0)
+        {
+            rok_int = age.Year - 1;
+            rok_string = rok_int switch
+            {
+                1 => "rok",
+                > 1 and < 5 => "lata",
+                > 5 => "lat",
+                _ => null
+            };
+        }
+
+        if (age.Month - 1 > 0)
+        {
+            miesiac_int = age.Month - 1;
+            miesiac_string = miesiac_int switch
+            {
+                1 => "miesiąc",
+                > 1 and < 5 => "miesiące",
+                > 5 => "miesięcy",
+                _ => null
+            };
+        }
+
+        if (age.Day - 1 > 0)
+        {
+            dzien_int = age.Day - 1;
+            dzien_string = dzien_int switch
+            {
+                1 => "dzień",
+                > 1 => "dni",
+                _ => null
+            };
+        }
+        string output = String.Empty;
+        output += $"{(rok_int.HasValue ? rok_int : "")} {rok_string ?? ""} ";
+        output += $"{(miesiac_int.HasValue ? miesiac_int : "")} {miesiac_string ?? ""} ";
+        if (rok_int.HasValue == false)
+            output += $"{(dzien_int.HasValue ? dzien_int : "")} {dzien_string ?? ""} ";
+
+        return output;
     }
 }
