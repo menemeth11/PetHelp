@@ -1,5 +1,6 @@
 ﻿@page "/podglad/{ZwierzeId}"
 @using Newtonsoft.Json
+@using PetHelp.Client.Conponent
 @using PetHelp.Client.States
 @using PetHelp.Shared.DTO
 @using System.Text.Json
@@ -25,7 +26,10 @@
             {
                 <InputFile id="uploadBtn1" OnChange="@LoadFile" style="display:none;" />
             }
+    
         </div>
+        <Kalendarz @ref="Kalendarz" PetID="zwierz.Id"/>
+        
         <div class="profile-column">
             <div class="profile-box box-dane">
                 <div class="profile-box-title">
@@ -279,7 +283,9 @@
     private string _source_Json { get; set; }
     private string dupa = "";
     private long maxFileSize = 5 * 1024 * 1024;
+    private Kalendarz Kalendarz;
     string ZwierzeImageUrl
+    
     {
         get
         {
@@ -456,5 +462,9 @@
             output += $"{(dzien_int.HasValue ? dzien_int : "")} {dzien_string ?? ""} ";
 
         return output;
+    }
+
+    public void chuj(){
+        
     }
 }

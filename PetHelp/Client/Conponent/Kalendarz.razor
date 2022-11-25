@@ -1,0 +1,228 @@
+﻿@using System.Text
+@using PetHelp.Shared.Enums
+
+@inject HttpClient KlientHTTP
+
+<PageTitle>Kalendarz</PageTitle>
+
+<div class="calendar">
+    <div class="month-section">
+        <div class="arrow-container">
+            <button class="btn btn-outline-primary btn-arrow" @onclick="()=>OnClick_ChangeCalendarPage(-1)" >
+                <span>&lt;=</span>
+            </button>
+        </div>        
+        <div class="month-container">
+            @if(DetailsOn)
+            {
+                <div>@SelectedDay.ToShortDateString()</div>
+            }
+            else
+            {
+                <div>@(MiesiaceDict[SelectedDay.Month]) </div>
+                <div class="year">[@SelectedDay.Year]</div>
+            }
+        </div>
+        <div class="arrow-container">
+            <button class="btn btn-outline-primary btn-arrow" @onclick="()=>OnClick_ChangeCalendarPage(1)">
+                <span>=&gt;</span>
+            </button>
+        </div>        
+    </div>
+    <table hidden="@DetailsOn">
+        <thead>
+            <tr>
+                <th>Pn</th>
+                <th>Wt</th>
+                <th>Śr</th>
+                <th>Cz</th>
+                <th>Pt</th>
+                <th>So</th>
+                <th class="niedziela" >Nd</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int d = 1; d <= MonthEnd.Day; )
+            {
+                <tr>
+                    @for (int i = 1; i <= 6; i++)
+                    {
+                        DateTime ? _day = null;
+                        @if(d <= this.MonthEnd.Day)
+                        {
+                            _day = new DateTime(MonthEnd.Year, MonthEnd.Month, d);
+                        }
+
+                        @if (_day.HasValue && _day.Value.DayOfWeek == (DayOfWeek)i)
+                        {
+                            <td class="@(_day == DateTime.Today?"dzis":String.Empty) day" @onclick="()=>OnClick_OpenDetails(_day.Value)">
+                                <div>
+                                    @_day.Value.Day
+                                </div>
+                                <div style="margin-bottom:3px; font-size:8px;">
+                                   @(PrintCircles(this.Posilki.Where(x=>x.Date.Year == _day.Value.Year && x.Date.Day == _day.Value.Day).ToList()))
+                                </div>
+                            </td>
+                            d++;
+                        }
+                        else
+                        {
+                            <td class="day-other"> - </td>
+                            continue;
+                        }
+                    }
+
+                    @{
+                        DateTime? _day_niedziela = null;
+                    }
+                    @if(d <= this.MonthEnd.Day)
+                    {
+                        _day_niedziela = new DateTime(MonthEnd.Year, MonthEnd.Month, d);
+                    }
+
+                    @if(_day_niedziela.HasValue && _day_niedziela.Value.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        <td class="@(_day_niedziela == DateTime.Today?"dzis":String.Empty) day niedziela " @onclick="()=>OnClick_OpenDetails(_day_niedziela.Value)">
+                            <div>
+                                @_day_niedziela.Value.Day
+                            </div>
+                            <div style="margin-bottom:3px; font-size:8px;">
+                                @(PrintCircles(this.Posilki.Where(x => x.Date.Year == _day_niedziela.Value.Year && x.Date.Day == _day_niedziela.Value.Day).ToList()))
+                            </div>
+                        </td>
+                        d++;
+                    }
+                    else
+                    {
+                        <td class="day-other"> - </td>
+                    }
+                </tr>
+
+            }
+        </tbody>
+    </table>
+    <div hidden="@(!DetailsOn)" class="details-container">
+        <div class="details-content">
+            @for(int index=1;index<=3;index++)
+            {
+                MealRecord? record = this.Posilki.FirstOrDefault(x => (int)x.Type == index && x.Date.Day == this.SelectedDay.Day);
+                <div class="meal-container">
+                <div class="index">@index</div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Nazwa</td>
+                            <td><input type="text" placeholder="Nazwa posiłku" value="@record?.Name" /></td>
+                        </tr>
+                        <tr>
+                            <td>Gramatura</td>
+                                <td><input type="number" placeholder="Gramatura w gramach" value="@record?.Weight" /></td>
+                        </tr>
+                        <tr>
+                            <td>Godzina</td>
+                                <td><input type="time" placeholder="Godzina podania" value="@record?.Date"  style="height: 22px;" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+        <div class="details-buttons">
+            <button class="btn btn-outline-success">Zapisz</button>
+            <button class="btn btn-outline-danger">Clear</button>
+            <div style="width: 100%;"></div>
+            <button class="btn btn-outline-primary" @onclick="()=>DetailsOn = false">Wróć</button>
+        </div>
+    </div>
+</div>
+
+@code{
+    [Parameter] public int PetID { get; set; }
+    private bool DetailsOn = false;
+    DateTime SelectedDay { get; set; } = default;
+    DateTime MonthStart { get; set; }
+    DateTime MonthEnd { get; set; }
+
+
+    public static Dictionary<int, string> MiesiaceDict = new()
+    {
+        {1,"Styczeń"},{2,"Luty"},{3,"Marzec"},{4,"Kwiecień"},
+        {5,"Maj"},{6,"Czerwiec"},{7,"Lipiec"},{8,"Sierpień"},
+        {9,"Wrzesień"},{10,"Październik"},{11,"Listopad"},{12,"Grudzień"}
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("INITIALIZED");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Console.WriteLine("ParameterSET");
+
+        this.Posilki = await GetMeals(PetID, DateTime.Now);
+        RefreshSelectedDate(DateTime.Now);
+    }
+    private void RefreshSelectedDate(DateTime _date)
+    {
+        this.SelectedDay = _date;
+        this.MonthStart = new DateTime(SelectedDay.Year, SelectedDay.Month, 1);
+        this.MonthEnd = new DateTime(SelectedDay.Year, SelectedDay.Month, DateTime.DaysInMonth(SelectedDay.Year, SelectedDay.Month));
+    }
+    public async Task OnClick_ChangeCalendarPage(int _number)
+    {
+        DateTime newDate = this.DetailsOn?this.SelectedDay.AddDays(_number):this.SelectedDay.AddMonths(_number);
+
+        if(this.SelectedDay.Year != newDate.Year || this.SelectedDay.Month != newDate.Month)
+        {
+            this.Posilki = await GetMeals(PetID,newDate);
+        }
+
+        RefreshSelectedDate(newDate);
+        StateHasChanged();
+    }
+    private void OnClick_OpenDetails(DateTime _day)
+    {
+        RefreshSelectedDate(_day);
+        this.DetailsOn = true;
+    }
+
+
+    private async Task<List<MealRecord>> GetMeals(int _petId, DateTime _day)
+    {
+        var respond = await KlientHTTP.GetAsync($"Meal/{_day.Year}-{_day.Month}/{_petId}");
+        if (respond.IsSuccessStatusCode)
+        {
+            var pobranePosilki = await respond.Content.ReadFromJsonAsync<List<MealRecord>>() ?? new();
+            Console.WriteLine($"załadowano {this.Posilki.Count} zarejestrowanych posiłków dla {MiesiaceDict[_day.Month]} {_day.Year}r.");
+            return pobranePosilki;
+        }
+
+        Console.WriteLine($"Brak zarejestrowanych posiłków dla {MiesiaceDict[_day.Month]} {_day.Year}r.");
+        return new();
+    }
+
+    List<MealRecord> Posilki = new();
+
+    private const string FULLCIRCLE = "⬤";
+    private const string EMPTYCIRCLE = "〇";
+
+    private string PrintCircles(List<MealRecord> _posilki)
+    {
+        if(_posilki.Any())
+        {
+            Console.WriteLine();
+        }
+        char xxx = Convert.ToChar(FULLCIRCLE);
+
+        StringBuilder sb = new(String.Concat(EMPTYCIRCLE,EMPTYCIRCLE,EMPTYCIRCLE));
+
+        _posilki.ForEach(x => { 
+            sb[(int)x.Type - 1] = Convert.ToChar(FULLCIRCLE); 
+        });
+
+        return sb.ToString();
+    }
+    
+    public record MealRecord(int Id, int PetId, DateTime Date, int Weight, string Name, MealsEnum Type);
+}

@@ -27,7 +27,7 @@ public class Zwierze
 
 
     [ForeignKey("Hodowla")]
-    public int? HodowlaId { get; set; }
+    public int HodowlaId { get; set; }
     public Hodowla? Hodowla { get; set; }
 
     [ForeignKey("Wlasciciel")]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetHelp.Server.Data;
 
@@ -11,9 +12,10 @@ using PetHelp.Server.Data;
 namespace PetHelp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221125220701_update_zwierz_model")]
+    partial class update_zwierz_model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,37 +390,6 @@ namespace PetHelp.Server.Migrations
                     b.ToTable("ListaHodowli");
                 });
 
-            modelBuilder.Entity("PetHelp.Server.Models.MealRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PetId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Weight")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PetId");
-
-                    b.ToTable("Posilki");
-                });
-
             modelBuilder.Entity("PetHelp.Server.Models.rasy", b =>
                 {
                     b.Property<int>("Id")
@@ -619,17 +590,6 @@ namespace PetHelp.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Wlasciciel");
-                });
-
-            modelBuilder.Entity("PetHelp.Server.Models.MealRecord", b =>
-                {
-                    b.HasOne("PetHelp.Server.Models.Zwierze", "Pet")
-                        .WithMany()
-                        .HasForeignKey("PetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pet");
                 });
 
             modelBuilder.Entity("PetHelp.Server.Models.Zalacznik", b =>

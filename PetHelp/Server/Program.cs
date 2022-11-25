@@ -30,6 +30,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<IHodowlaRepositor, HodowlaRepository>();
 builder.Services.AddScoped<IZwierzeRepository, ZwierzeRepository>();
 builder.Services.AddScoped<IRasaRepository, RasaRepository>();
+builder.Services.AddScoped<IPosilkiRepository, PosilkiRepository>();
+
 
 var app = builder.Build();
 
