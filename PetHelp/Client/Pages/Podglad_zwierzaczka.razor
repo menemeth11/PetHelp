@@ -9,6 +9,7 @@
 @inject NavigationManager Navigation
 @inject StateManager _state;
 @inject IJSRuntime JS
+
 <div class="profile">
     <!-- Top navbar -->
     <div class="profile-topnav">
@@ -16,19 +17,20 @@
         <h2>Detale zwierzaka: @zwierz.Imie</h2>
     </div>
     <div class="wrapper">
-        <div class="profile-avatar">
-            <img class="@(EditMode?"imgHoverUpload":"")" src="@ZwierzeImageUrl" @onclick="HandleClick" @onmouseout="@OnMouseOut" @onmouseover="@OnMouseOver" />
-            @if (_IsHovering && EditMode)
-            {
-                <img class="upload-image" src="svg/add-image-svgrepo-com.svg" alt="upload image" />
-            }
-            @if (EditMode)
-            {
-                <InputFile id="uploadBtn1" OnChange="@LoadFile" style="display:none;" />
-            }
-    
+    <div style="margin-left: 20px; height:100%; display:flex; flex-direction: column; justify-content: space-between;">
+            <div class="profile-avatar">
+                <img class="@(EditMode?"imgHoverUpload":"")" src="@ZwierzeImageUrl" @onclick="HandleClick" @onmouseout="@OnMouseOut" @onmouseover="@OnMouseOver" />
+                @if (_IsHovering && EditMode)
+                {
+                    <img class="upload-image" src="svg/add-image-svgrepo-com.svg" alt="upload image" />
+                }
+                @if (EditMode)
+                {
+                    <InputFile id="uploadBtn1" OnChange="@LoadFile" style="display:none;" />
+                }
+            </div>
+            <Kalendarz @ref="Kalendarz" PetID="zwierz.Id"/>
         </div>
-        <Kalendarz @ref="Kalendarz" PetID="zwierz.Id"/>
         
         <div class="profile-column">
             <div class="profile-box box-dane">

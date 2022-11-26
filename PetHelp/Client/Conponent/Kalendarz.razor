@@ -1,4 +1,5 @@
 ﻿@using System.Text
+@using PetHelp.Shared.DTO
 @using PetHelp.Shared.Enums
 
 @inject HttpClient KlientHTTP
@@ -101,48 +102,143 @@
             }
         </tbody>
     </table>
-    <div hidden="@(!DetailsOn)" class="details-container">
+    @if(DetailsOn)
+    {
+        <div class="details-container">
         <div class="details-content">
             @for(int index=1;index<=3;index++)
             {
-                MealRecord? record = this.Posilki.FirstOrDefault(x => (int)x.Type == index && x.Date.Day == this.SelectedDay.Day);
-                <div class="meal-container">
-                <div class="index">@index</div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>Nazwa</td>
-                            <td><input type="text" placeholder="Nazwa posiłku" value="@record?.Name" /></td>
-                        </tr>
-                        <tr>
-                            <td>Gramatura</td>
-                                <td><input type="number" placeholder="Gramatura w gramach" value="@record?.Weight" /></td>
-                        </tr>
-                        <tr>
-                            <td>Godzina</td>
-                                <td><input type="time" placeholder="Godzina podania" value="@record?.Date"  style="height: 22px;" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                int mealType = index;
+                    MealRecordDTO? istniejacyPosilek = this.Posilki.FirstOrDefault(x => MatchDay(x,index,SelectedDay));
+                
+                if(istniejacyPosilek != null)
+                {
+                    <div class="meal-container">
+                    <div class="index">@index</div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Nazwa</td>
+                                    <td><input type="text" placeholder="Nazwa posiłku" @bind="istniejacyPosilek.Name" /></td>
+                            </tr>
+                            <tr>
+                                <td>Gramatura</td>
+                                    <td><input type="number" placeholder="Gramatura w gramach" @bind="istniejacyPosilek.Weight" /></td>
+                            </tr>
+                            <tr>
+                                <td>Godzina</td>
+                                        <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                }
+                else
+                {
+                    <div class="meal-container">
+                        <div class="index">@mealType</div>
+                        @{
+                            var _nowyPosilek = this.NowePosilki.FirstOrDefault(x => MatchDay(x, mealType, this.SelectedDay));
+                        }
+                        @if(_nowyPosilek == null)
+                        {
+                            <div style="display: flex;width:100%;height:100%;">
+                                <input class="btn btn-outline-dark" style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto;" hidden="@(_nowyPosilek != null)" type="button" value="dodaj" @onclick="()=>NewMeal(this.SelectedDay,mealType)" />
+                            </div>
+                        }
+                        @if(_nowyPosilek != null)
+                        {
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>Nazwa</td>
+                                        <td><input type="text" placeholder="Nazwa posiłku" @bind="_nowyPosilek.Name" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gramatura</td>
+                                        <td><input type="number" placeholder="Gramatura w gramach" @bind="_nowyPosilek.Weight" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Godzina</td>
+                                        <td>
+                                                <input type="time" placeholder="Godzina podania" value="@_nowyPosilek.Date.ToShortTimeString()" @onchange="(args) => HandleDateConversion(args, _nowyPosilek)" style="height: 22px;" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                }
             }
         </div>
         <div class="details-buttons">
-            <button class="btn btn-outline-success">Zapisz</button>
-            <button class="btn btn-outline-danger">Clear</button>
+            <button class="btn btn-outline-success" @onclick="()=>Zapisz()">Zapisz</button>
+            <button class="btn btn-outline-danger">Wyczyść</button>
             <div style="width: 100%;"></div>
             <button class="btn btn-outline-primary" @onclick="()=>DetailsOn = false">Wróć</button>
         </div>
     </div>
+    }
 </div>
 
 @code{
+    private List<MealRecordDTO> NowePosilki = new();
+
     [Parameter] public int PetID { get; set; }
     private bool DetailsOn = false;
     DateTime SelectedDay { get; set; } = default;
     DateTime MonthStart { get; set; }
     DateTime MonthEnd { get; set; }
 
+    public bool MatchDay(MealRecordDTO x, int mealType, DateTime SelectedDay)
+    {
+        return x.Date.Day == SelectedDay.Day &&
+               x.Date.Month == SelectedDay.Month &&
+               x.Date.Year == SelectedDay.Year &&
+               x.Type == mealType;
+    }
+
+    private void HandleDateConversion(ChangeEventArgs args, MealRecordDTO _nowyPosilek)
+    {
+        _nowyPosilek.Date = default;
+        if(args.Value != null)
+        {
+            TimeOnly.TryParse(args.Value.ToString(), out TimeOnly time); 
+            if (time != null) 
+            {
+                _nowyPosilek.Date = new DateTime(SelectedDay.Year, SelectedDay.Month, SelectedDay.Day, time.Hour, time.Minute, time.Second);
+            }
+        }
+    }
+
+    private void NewMeal(DateTime _day, int _type)
+    {
+        MealRecordDTO posilek = new()
+        {
+            Date = _day,
+            PetId = this.PetID,
+            Type = _type
+        };
+
+        NowePosilki.Add(posilek);
+
+        StateHasChanged();
+    }
+
+    private async Task Zapisz()
+    {
+        var response = await KlientHTTP.PostAsJsonAsync("Meal/Add", this.NowePosilki.Where(x=>x.Date != default).ToList());
+
+        if(response.IsSuccessStatusCode)
+        {
+            this.Posilki.AddRange(NowePosilki.Where(x => x.Date != default).ToList());
+            NowePosilki = NowePosilki.Except(NowePosilki.Where(x => x.Date != default).ToList()).ToList();
+        }
+        else
+        {
+            Console.WriteLine("Blad zapisu");
+        }
+    }
 
     public static Dictionary<int, string> MiesiaceDict = new()
     {
@@ -188,12 +284,12 @@
     }
 
 
-    private async Task<List<MealRecord>> GetMeals(int _petId, DateTime _day)
+    private async Task<List<MealRecordDTO>> GetMeals(int _petId, DateTime _day)
     {
         var respond = await KlientHTTP.GetAsync($"Meal/{_day.Year}-{_day.Month}/{_petId}");
         if (respond.IsSuccessStatusCode)
         {
-            var pobranePosilki = await respond.Content.ReadFromJsonAsync<List<MealRecord>>() ?? new();
+            var pobranePosilki = await respond.Content.ReadFromJsonAsync<List<MealRecordDTO>>() ?? new();
             Console.WriteLine($"załadowano {this.Posilki.Count} zarejestrowanych posiłków dla {MiesiaceDict[_day.Month]} {_day.Year}r.");
             return pobranePosilki;
         }
@@ -202,12 +298,12 @@
         return new();
     }
 
-    List<MealRecord> Posilki = new();
+    List<MealRecordDTO> Posilki = new();
 
     private const string FULLCIRCLE = "⬤";
     private const string EMPTYCIRCLE = "〇";
 
-    private string PrintCircles(List<MealRecord> _posilki)
+    private string PrintCircles(List<MealRecordDTO> _posilki)
     {
         if(_posilki.Any())
         {
@@ -223,6 +319,5 @@
 
         return sb.ToString();
     }
-    
-    public record MealRecord(int Id, int PetId, DateTime Date, int Weight, string Name, MealsEnum Type);
+       
 }

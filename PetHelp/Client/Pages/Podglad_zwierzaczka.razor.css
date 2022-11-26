@@ -3,7 +3,7 @@
     width: calc(100vw-250px);
     position: relative;
     background: #cfcfcf;
-    padding-bottom: 24px
+    padding-bottom: .5rem;
 }
 
     .profile .wrapper {
@@ -22,7 +22,7 @@
     gap: 16px;
     height: 51px;
     background: #808080;
-    margin-bottom: 24px;
+    margin-bottom: .5rem;
     color: white;
 }
 
@@ -44,9 +44,9 @@
     position: relative;
     border: 5px solid #0A4A8D;
     aspect-ratio: 1/1.5;
-    width: 25%;
     overflow: hidden;
-    margin-left: 20px;
+    /*width: 25%;
+    margin-left: 20px;*/
 }
 
     .profile-avatar img {

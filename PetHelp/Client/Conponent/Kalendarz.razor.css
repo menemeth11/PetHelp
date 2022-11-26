@@ -2,8 +2,12 @@
     padding: 0;
     width: fit-content;
     height: fit-content;
+    min-height: 328px;
     border: 2px solid #0d6efd;
     border-radius: 15px;
+    background-color: white;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
     .calendar table {
