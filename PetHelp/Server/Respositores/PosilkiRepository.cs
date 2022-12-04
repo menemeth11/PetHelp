@@ -38,4 +38,9 @@ public class PosilkiRepository : IPosilkiRepository
         return posilki;
     }
 
+    public void UpdateRange(List<MealRecord> mealRecords)
+    {
+        context.UpdateRange(mealRecords);
+        context.SaveChanges();
+    }
 }

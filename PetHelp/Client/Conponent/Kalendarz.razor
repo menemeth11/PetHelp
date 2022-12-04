@@ -119,7 +119,7 @@
                         <tbody>
                             <tr>
                                 <td>Nazwa</td>
-                                    <td><input type="text" placeholder="Nazwa posiłku" @bind="istniejacyPosilek.Name" /></td>
+                                <td><input type="text" placeholder="Nazwa posiłku" @bind="istniejacyPosilek.Name" /></td>
                             </tr>
                             <tr>
                                 <td>Gramatura</td>
@@ -127,7 +127,7 @@
                             </tr>
                             <tr>
                                 <td>Godzina</td>
-                                        <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
+                                <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -182,13 +182,17 @@
 </div>
 
 @code{
-    private List<MealRecordDTO> NowePosilki = new();
-
     [Parameter] public int PetID { get; set; }
-    private bool DetailsOn = false;
+
+    List<MealRecordDTO> NowePosilki = new();
+    List<MealRecordDTO> Posilki = new();
+
+    bool DetailsOn = false;
     DateTime SelectedDay { get; set; } = default;
     DateTime MonthStart { get; set; }
     DateTime MonthEnd { get; set; }
+    const string FULLCIRCLE = "⬤";
+    const string EMPTYCIRCLE = "〇";
 
     public bool MatchDay(MealRecordDTO x, int mealType, DateTime SelectedDay)
     {
@@ -203,8 +207,7 @@
         _nowyPosilek.Date = default;
         if(args.Value != null)
         {
-            TimeOnly.TryParse(args.Value.ToString(), out TimeOnly time); 
-            if (time != null) 
+            if (TimeOnly.TryParse(args.Value.ToString(), out TimeOnly time)) 
             {
                 _nowyPosilek.Date = new DateTime(SelectedDay.Year, SelectedDay.Month, SelectedDay.Day, time.Hour, time.Minute, time.Second);
             }
@@ -213,7 +216,7 @@
 
     private void NewMeal(DateTime _day, int _type)
     {
-        MealRecordDTO posilek = new()
+        MealRecordDTO posilek = new(MealRecordDTO.States.Added)
         {
             Date = _day,
             PetId = this.PetID,
@@ -225,18 +228,47 @@
         StateHasChanged();
     }
 
-    private async Task Zapisz()
+    public async Task Zapisz()
     {
-        var response = await KlientHTTP.PostAsJsonAsync("Meal/Add", this.NowePosilki.Where(x=>x.Date != default).ToList());
-
-        if(response.IsSuccessStatusCode)
+        List<Task> _Tasks = new();
+        if(this.NowePosilki.Any(x=>x.Date != default))
         {
-            this.Posilki.AddRange(NowePosilki.Where(x => x.Date != default).ToList());
-            NowePosilki = NowePosilki.Except(NowePosilki.Where(x => x.Date != default).ToList()).ToList();
+            _Tasks.Add(Dodaj());
         }
-        else
+
+        if(this.Posilki.Any(x=>x.CurrentState == MealRecordDTO.States.Updated))
         {
-            Console.WriteLine("Blad zapisu");
+            _Tasks.Add(Aktualizuj());
+        }
+        if(!_Tasks.Any())
+        {
+            Console.WriteLine("Brak zmian do zapisania");
+        }
+        await Task.WhenAll(_Tasks.ToArray());
+    }
+    private async Task Dodaj()
+    {
+        var body = NowePosilki.Where(x => x.Date != default).ToList();
+        Console.WriteLine($"Dodawanie {body.Count} wposów do kalendarza");
+        var request = await KlientHTTP.PostAsJsonAsync("Meal/AddRange", body);
+        if(request.IsSuccessStatusCode)
+        {
+            var addedData = await request.Content.ReadFromJsonAsync<List<MealRecordDTO>>() ?? new();
+            if(addedData.Any())
+            {
+                this.Posilki.AddRange(addedData);
+                this.NowePosilki.Clear();
+            }
+        }
+    }
+    private async Task Aktualizuj()
+    {
+        var body = this.Posilki.Where(x => x.CurrentState == MealRecordDTO.States.Updated).ToList();
+        Console.WriteLine($"Aktualizowanie {body.Count} wposów do kalendarza");
+        var request = await KlientHTTP.PostAsJsonAsync("Meal/UpdateRange", body);
+        if(request.IsSuccessStatusCode)
+        {
+            body.ForEach(x => x.SetState(MealRecordDTO.States.None));
         }
     }
 
@@ -247,24 +279,19 @@
         {9,"Wrzesień"},{10,"Październik"},{11,"Listopad"},{12,"Grudzień"}
     };
 
-    protected override async Task OnInitializedAsync()
-    {
-        Console.WriteLine("INITIALIZED");
-    }
-
     protected override async Task OnParametersSetAsync()
     {
-        Console.WriteLine("ParameterSET");
-
         this.Posilki = await GetMeals(PetID, DateTime.Now);
         RefreshSelectedDate(DateTime.Now);
     }
+
     private void RefreshSelectedDate(DateTime _date)
     {
         this.SelectedDay = _date;
         this.MonthStart = new DateTime(SelectedDay.Year, SelectedDay.Month, 1);
         this.MonthEnd = new DateTime(SelectedDay.Year, SelectedDay.Month, DateTime.DaysInMonth(SelectedDay.Year, SelectedDay.Month));
     }
+
     public async Task OnClick_ChangeCalendarPage(int _number)
     {
         DateTime newDate = this.DetailsOn?this.SelectedDay.AddDays(_number):this.SelectedDay.AddMonths(_number);
@@ -277,12 +304,12 @@
         RefreshSelectedDate(newDate);
         StateHasChanged();
     }
+
     private void OnClick_OpenDetails(DateTime _day)
     {
         RefreshSelectedDate(_day);
         this.DetailsOn = true;
     }
-
 
     private async Task<List<MealRecordDTO>> GetMeals(int _petId, DateTime _day)
     {
@@ -298,17 +325,8 @@
         return new();
     }
 
-    List<MealRecordDTO> Posilki = new();
-
-    private const string FULLCIRCLE = "⬤";
-    private const string EMPTYCIRCLE = "〇";
-
     private string PrintCircles(List<MealRecordDTO> _posilki)
     {
-        if(_posilki.Any())
-        {
-            Console.WriteLine();
-        }
         char xxx = Convert.ToChar(FULLCIRCLE);
 
         StringBuilder sb = new(String.Concat(EMPTYCIRCLE,EMPTYCIRCLE,EMPTYCIRCLE));

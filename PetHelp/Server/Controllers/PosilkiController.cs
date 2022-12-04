@@ -21,16 +21,49 @@ public class PosilkiController : ControllerBase
     public List<MealRecord> ListaPosilkowZwierzaka(int year, int month, int petId) => 
         _posilkiRepo.GetPosilki(petId, new DateTime(year,month,1));
 
-    [HttpPost("Add")]
-    public ActionResult<List<MealRecord>> DodajPosilki(List<MealRecord> _posilki)
+    [HttpPost("AddRange")]
+    public ActionResult<List<MealRecordDTO>> DodajPosilki(List<MealRecordDTO> _posilki)
     {
-        var lista = _posilkiRepo.AddRange(_posilki);
+        var lista = _posilkiRepo.AddRange(_posilki.Select(x =>
+            new MealRecord {
+                Id = x.Id,
+                Date = x.Date,
+                Name = x.Name,
+                PetId = x.PetId,
+                Weight = x.Weight,
+                Type = x.Type
+            }).ToList());
 
         if(lista == null)
         {
             return BadRequest();
         }
 
-        return lista;
+        return lista.Select(x =>
+            new MealRecordDTO
+            {
+                Id = x.Id,
+                Date = x.Date,
+                Name = x.Name,
+                PetId = x.PetId,
+                Weight = x.Weight,
+                Type = x.Type,
+            }).ToList();
+    }
+
+    [HttpPost("UpdateRange")]
+    public IActionResult Aktualizuj(List<MealRecordDTO> _posilki)
+    {
+        _posilkiRepo.UpdateRange(_posilki.Select(x => 
+            new MealRecord {
+                Id = x.Id,
+                Date = x.Date,
+                Name = x.Name,
+                PetId = x.PetId,
+                Weight = x.Weight,
+                Type = x.Type
+            }).ToList());
+
+        return Ok();
     }
 }

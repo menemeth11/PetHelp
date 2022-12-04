@@ -4,6 +4,7 @@ namespace PetHelp.Server.Interfaces;
 
 public interface IPosilkiRepository
 {
-    public List<MealRecord> AddRange(List<MealRecord> posilki);
-    public List<MealRecord> GetPosilki(int Id, DateTime data);
+    List<MealRecord> AddRange(List<MealRecord> posilki);
+    List<MealRecord> GetPosilki(int Id, DateTime data);
+    void UpdateRange(List<MealRecord> mealRecords);
 }
