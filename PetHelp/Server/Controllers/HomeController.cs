@@ -134,6 +134,7 @@ public class HomeController : ControllerBase
     public void AktualizujZwierze(ZwierzeDTO x)
     {
         _zwierzeRepo.AktualizujZwierze(x);
+        
     }
 
     [HttpDelete("Usun/{idzwierzaka}")]
@@ -146,6 +147,8 @@ public class HomeController : ControllerBase
     public void UsunHodowle(int idhodowli)
     {
         _hodowlaRepo.Usun(idhodowli);
+        Console.WriteLine($"Usuniecie hodowli {idhodowli}");
+
     }
 }
 

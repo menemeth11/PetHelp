@@ -43,4 +43,17 @@ public class PosilkiRepository : IPosilkiRepository
         context.UpdateRange(mealRecords);
         context.SaveChanges();
     }
+
+    public void UsunKilka(List<int> ids)
+    {
+        var posilekDoUsuniecia = new List<MealRecord>();
+        foreach (var id  in ids)
+        {
+            var xx = context.Posilki.Find(id);
+            if (xx != null)
+                posilekDoUsuniecia.Add(xx);
+        }
+        context.Posilki.RemoveRange(posilekDoUsuniecia);
+        context.SaveChanges();
+    }
 }

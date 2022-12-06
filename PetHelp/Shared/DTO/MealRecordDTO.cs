@@ -5,6 +5,7 @@ public class MealRecordDTO
     private string? _name = null;
     private int? _weight = null;
     private DateTime? _date = null;
+    public bool isSelected = false;
 
     public MealRecordDTO()
     {
@@ -81,6 +82,7 @@ public class MealRecordDTO
         None,
         Added,
         Updated,
-        Deleted
+        Deleted,
+        Selected
     }
 }

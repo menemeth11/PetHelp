@@ -3,18 +3,19 @@ using PetHelp.Server.Data;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
 using PetHelp.Shared.DTO;
-using System.Linq;
-using System.Security.Cryptography;
+// ctrl R,G
 
 namespace PetHelp.Server.Respositores;
 
 public class ZwierzeRepository : IZwierzeRepository
 {
     private readonly ApplicationDbContext context;
+    private readonly ILoggerRepository _loggerRepo;
 
-    public ZwierzeRepository(ApplicationDbContext context)
+    public ZwierzeRepository(ApplicationDbContext context, ILoggerRepository loggerRepo)
     {
         this.context = context;
+        _loggerRepo = loggerRepo;
     }
 
     public List<Zwierze> GetByHodowla(int hodowlaId, bool includeAttachment = true)
@@ -86,8 +87,9 @@ public class ZwierzeRepository : IZwierzeRepository
         if (edited is null) return;
 
         Zwierze? orginal = context.Zwierzeta.Find(edited.Id);
+        _loggerRepo.LogToDb($"Zaktualizono zwierze {orginal?.Imie}");
 
-        if(orginal is null) return;
+        if (orginal is null) return;
 
         orginal.Imie = edited.Imie;
         orginal.Gatunek = edited.Gatunek;
@@ -109,7 +111,10 @@ public class ZwierzeRepository : IZwierzeRepository
 
     public void Usun(int idzwierzaka)
     {
-        context.Zwierzeta.Remove(context.Zwierzeta.Find(idzwierzaka));
+        var bąbel = context.Zwierzeta.Find(idzwierzaka);
+        Console.WriteLine($"Usuniecie zwierze {bąbel.Imie}");
+
+        context.Zwierzeta.Remove(bąbel);
         context.SaveChanges();
     }
 }

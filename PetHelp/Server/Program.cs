@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using PetHelp.Server.Data;
-using PetHelp.Server.Models;
-using Microsoft.AspNetCore.Identity;
 using PetHelp.Server.Interfaces;
+using PetHelp.Server.Models;
 using PetHelp.Server.Respositores;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,11 +24,13 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IHodowlaRepositor, HodowlaRepository>();
 builder.Services.AddScoped<IZwierzeRepository, ZwierzeRepository>();
 builder.Services.AddScoped<IRasaRepository, RasaRepository>();
 builder.Services.AddScoped<IPosilkiRepository, PosilkiRepository>();
+builder.Services.AddScoped<ILoggerRepository, LoggerRepository>();
+
 
 
 var app = builder.Build();

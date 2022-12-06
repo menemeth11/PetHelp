@@ -7,4 +7,5 @@ public interface IPosilkiRepository
     List<MealRecord> AddRange(List<MealRecord> posilki);
     List<MealRecord> GetPosilki(int Id, DateTime data);
     void UpdateRange(List<MealRecord> mealRecords);
+    void UsunKilka(List<int> ids);
 }

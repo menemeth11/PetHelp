@@ -110,10 +110,17 @@
             {
                 int mealType = index;
                     MealRecordDTO? istniejacyPosilek = this.Posilki.FirstOrDefault(x => MatchDay(x,index,SelectedDay));
-                
+
+                string SelectedStyle = "";
+
                 if(istniejacyPosilek != null)
                 {
-                    <div class="meal-container">
+                        if (istniejacyPosilek.isSelected == true)
+                        {
+                            SelectedStyle = "background-color:red;";
+                        }
+
+                        <div class="meal-container" @onclick="()=>Changecolor(istniejacyPosilek)" style="@SelectedStyle">
                     <div class="index">@index</div>
                     <table>
                         <tbody>
@@ -135,11 +142,15 @@
                 }
                 else
                 {
-                    <div class="meal-container">
-                        <div class="index">@mealType</div>
-                        @{
-                            var _nowyPosilek = this.NowePosilki.FirstOrDefault(x => MatchDay(x, mealType, this.SelectedDay));
+                        var _nowyPosilek = this.NowePosilki.FirstOrDefault(x => MatchDay(x, mealType, this.SelectedDay));
+
+                        if (_nowyPosilek != null && _nowyPosilek.isSelected == true)
+                        {
+                            SelectedStyle = "background-color:red;";
                         }
+
+                        <div class="meal-container" @onclick="()=>Changecolor(_nowyPosilek)" style="@SelectedStyle">
+                        <div class="index">@mealType</div>
                         @if(_nowyPosilek == null)
                         {
                             <div style="display: flex;width:100%;height:100%;">
@@ -172,8 +183,8 @@
             }
         </div>
         <div class="details-buttons">
-            <button class="btn btn-outline-success" @onclick="()=>Zapisz()">Zapisz</button>
-            <button class="btn btn-outline-danger">Wyczyść</button>
+            <button class="btn btn-outline-success" @onclick="Zapisz">Zapisz</button>
+                <button class="btn btn-outline-danger" @onclick=Wyczysc>Wyczyść</button>
             <div style="width: 100%;"></div>
             <button class="btn btn-outline-primary" @onclick="()=>DetailsOn = false">Wróć</button>
         </div>
@@ -220,7 +231,8 @@
         {
             Date = _day,
             PetId = this.PetID,
-            Type = _type
+            Type = _type,
+            isSelected = true
         };
 
         NowePosilki.Add(posilek);
@@ -337,5 +349,40 @@
 
         return sb.ToString();
     }
-       
+
+    private async Task Wyczysc()
+    {
+        List<MealRecordDTO> dowyczyszczenia = new();
+        foreach(var x in NowePosilki)
+        {
+            if (x.isSelected == true)
+                dowyczyszczenia.Add(x);
+        }
+        NowePosilki = NowePosilki.Except(dowyczyszczenia).ToList();
+
+        //NowePosilki = NowePosilki.Except(NowePosilki.Where(x => x.isSelected)).ToList(); // [LINQ] alternatywne szybsze rozwiązanie ucz się piotruś <3
+        List<MealRecordDTO> dowyczyszczenia2 = new();
+        foreach (var x in Posilki)
+        {
+            if (x.isSelected == true)
+                dowyczyszczenia2.Add(x);
+        }
+        var body = dowyczyszczenia2.Select(x => x.Id).ToList();
+        await KlientHTTP.PostAsJsonAsync<List<int>>($"Meal/Wyczysc",body);
+        Posilki = Posilki.Except(Posilki.Where(x => x.isSelected)).ToList();
+
+    }
+    private void Changecolor(MealRecordDTO? pudelko)
+    {
+        if (pudelko == null) return; 
+
+        if (pudelko.isSelected == true)
+        {
+            pudelko.isSelected = false;
+        }
+        else
+        {
+            pudelko.isSelected = true;
+        }
+    }
 }

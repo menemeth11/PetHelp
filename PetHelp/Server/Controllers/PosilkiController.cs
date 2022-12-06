@@ -66,4 +66,10 @@ public class PosilkiController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPost("Wyczysc")]
+    public void Wyczysc(List<int> ids)
+    {
+        _posilkiRepo.UsunKilka(ids);
+    }
 }
