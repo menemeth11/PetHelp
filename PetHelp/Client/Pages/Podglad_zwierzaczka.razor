@@ -287,7 +287,7 @@
     private long maxFileSize = 5 * 1024 * 1024;
     private Kalendarz Kalendarz;
     string ZwierzeImageUrl
-    
+
     {
         get
         {
@@ -421,6 +421,8 @@
         int? rok_int = null, miesiac_int = null, dzien_int = null;
         string? rok_string = null, miesiac_string = null, dzien_string = null;
         var difference = _day - _bDay;
+        if (difference.TotalMilliseconds < 0)
+            difference = new TimeSpan(0);
         DateTime age = new DateTime().Add(difference);
 
         if (age.Year - 1 > 0)
@@ -430,7 +432,7 @@
             {
                 1 => "rok",
                 > 1 and < 5 => "lata",
-                > 5 => "lat",
+                >= 5 => "lat",
                 _ => null
             };
         }
@@ -442,7 +444,7 @@
             {
                 1 => "miesiąc",
                 > 1 and < 5 => "miesiące",
-                > 5 => "miesięcy",
+                >= 5 => "miesięcy",
                 _ => null
             };
         }
