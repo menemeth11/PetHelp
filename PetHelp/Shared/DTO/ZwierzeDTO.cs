@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PetHelp.Server.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PetHelp.Shared.DTO;
 public class ZwierzeDTO
@@ -54,4 +55,5 @@ public class ZwierzeDTO
 	public string Zdjecie_MIME { get; set; } = String.Empty;
 	public string Zdjecie_Name { get; set; } = String.Empty;
 	public byte[] Zdjecie_Data { get; set; } = Array.Empty<byte>();
+	public List<SzczepienieDTO> Lista_Szczepien { get; set; } = new List<SzczepienieDTO>();
 }

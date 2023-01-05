@@ -2,7 +2,9 @@
 using PetHelp.Server.Data;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
+using PetHelp.Shared;
 using PetHelp.Shared.DTO;
+using static PetHelp.Shared.SzczepienieDetale;
 
 namespace PetHelp.Server.Respositores;
 
@@ -10,26 +12,12 @@ public class SzczepieniaRepository : ISzczepieniaRepository
 {
     private readonly ApplicationDbContext context;
 
-    public static List<SzczepienieInfo> listaDostepnychszczepien = new(){
-        new SzczepienieInfo()
-        {
-            ID = 1,
-            Name = "3w1",
-            Description = "PArowkoza, nosowka itp",
-            IntervalArr = new int[5] { 49, 21, 21, 365, 1095 }
-        },
-        new SzczepienieInfo()
-        {
-            ID = 2,
-            Name = "Wscieklizna",
-            Description = "Wscieklizna",
-            IntervalArr = new int[2] { 105, 365 }
-        }
-    };
+    public static List<SzczepienieInfo> listaDostepnychszczepien = new();
 
     public SzczepieniaRepository(ApplicationDbContext context)
     {
         this.context = context;
+        listaDostepnychszczepien = SzczepienieDetale.Szczepienia();
     }
 
     public List<SzczepienieRecord> UzupelnijOdbyteSzczepienia(DateTime dataUrodzenia)

@@ -96,6 +96,15 @@ public class HomeController : ControllerBase
             Zdjecie_MIME = zwierz.Zdjecie_MIME,
             Zdjecie_Name = zwierz.Zdjecie_Name,
             Zdjecie_Data = zwierz.Zdjecie_Data,
+            Lista_Szczepien = zwierz.ListaSzczepien.Select(x => new SzczepienieDTO 
+            { 
+                Id = x.Id,
+                SzczepienieType = x.SzczepienieType,
+                Data = x.Data,
+                DataInnyTermin = x.DataInnyTermin,
+                CzyOdbyte = x.CzyOdbyte,
+                ZwierzeId = x.ZwierzeId,
+            }).ToList()
         };
     }
 
