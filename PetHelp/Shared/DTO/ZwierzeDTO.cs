@@ -1,4 +1,6 @@
-﻿namespace PetHelp.Shared.DTO;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PetHelp.Shared.DTO;
 public class ZwierzeDTO
 {
 
@@ -31,6 +33,10 @@ public class ZwierzeDTO
         {
             if (value > DateTime.Now)
                 value = DateTime.Now;
+
+			if (value < DataUrodzenia)
+				value = DataUrodzenia;
+
             waga_Pomiar = value;
         }
     }

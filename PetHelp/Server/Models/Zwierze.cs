@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NuGet.Protocol.Core.Types;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetHelp.Server.Models;
@@ -24,7 +25,7 @@ public class Zwierze
 
     public Zalacznik? Zdjecie { get; set; } // TODO: zrobic liste
     //public List<Zalacznik> Zalaczniki { get; set; } = new();
-
+    public List<SzczepienieRecord> ListaSzczepien { get; set; } = new();
 
     [ForeignKey("Hodowla")]
     public int HodowlaId { get; set; }

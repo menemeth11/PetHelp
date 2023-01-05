@@ -103,6 +103,7 @@ public class HomeController : ControllerBase
     public ZwierzeDTO DodajZwierze(ZwierzeDTO x)
     {
         Zwierze zwierze = _zwierzeRepo.DodajZwierze(x);
+
         return new ZwierzeDTO()
         {
             Id = zwierze.Id ,
@@ -126,7 +127,6 @@ public class HomeController : ControllerBase
             Zdjecie_Name = zwierze.Zdjecie_Name,
             Zdjecie_Data = zwierze.Zdjecie_Data,
             rasaId = (int)zwierze.rasy_psowId,
-
         };
     }
 

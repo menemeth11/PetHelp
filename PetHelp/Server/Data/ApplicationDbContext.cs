@@ -18,7 +18,8 @@ namespace PetHelp.Server.Data
         public DbSet<Zalacznik> Zalaczniks { get; set; }
         public DbSet<rasy> Rasy { get; set; }
         public DbSet<MealRecord> Posilki { get; set; }
-        
+        public DbSet<SzczepienieRecord> Szczepienia { get; set; }
+
         public DbSet<Log> Logi { get; set; }
     }
 }

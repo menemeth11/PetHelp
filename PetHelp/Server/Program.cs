@@ -30,6 +30,7 @@ builder.Services.AddScoped<IZwierzeRepository, ZwierzeRepository>();
 builder.Services.AddScoped<IRasaRepository, RasaRepository>();
 builder.Services.AddScoped<IPosilkiRepository, PosilkiRepository>();
 builder.Services.AddScoped<ILoggerRepository, LoggerRepository>();
+builder.Services.AddScoped<ISzczepieniaRepository, SzczepieniaRepository>();
 
 
 

@@ -11,11 +11,14 @@ public class ZwierzeRepository : IZwierzeRepository
 {
     private readonly ApplicationDbContext context;
     private readonly ILoggerRepository _loggerRepo;
+    private readonly ISzczepieniaRepository _szczepienieRepo;
 
-    public ZwierzeRepository(ApplicationDbContext context, ILoggerRepository loggerRepo)
+
+    public ZwierzeRepository(ApplicationDbContext context, ILoggerRepository loggerRepo, ISzczepieniaRepository szczepienieRepo)
     {
         this.context = context;
         _loggerRepo = loggerRepo;
+        _szczepienieRepo = szczepienieRepo;
     }
 
     public List<Zwierze> GetByHodowla(int hodowlaId, bool includeAttachment = true)
@@ -38,6 +41,8 @@ public class ZwierzeRepository : IZwierzeRepository
 
     public Zwierze DodajZwierze(ZwierzeDTO nowe)
     {
+        List<SzczepienieRecord> listaOdbytychSzczepien = _szczepienieRepo.UzupelnijOdbyteSzczepienia(nowe.DataUrodzenia);
+
         Zwierze zwierze = new Zwierze()
         {
             Id = nowe.Id,
@@ -60,7 +65,8 @@ public class ZwierzeRepository : IZwierzeRepository
             Zdjecie_MIME = nowe.Zdjecie_MIME,
             Zdjecie_Name = nowe.Zdjecie_Name,
             Zdjecie_Data = nowe.Zdjecie_Data,
-            rasy_psowId = nowe.rasaId
+            rasy_psowId = nowe.rasaId,
+            ListaSzczepien = listaOdbytychSzczepien
         };
         context.Zwierzeta.Add(zwierze);
         context.SaveChanges();
