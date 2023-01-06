@@ -1,21 +1,33 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PetHelp.Server.Models;
+namespace PetHelp.Shared.DTO;
 
 public class SzczepienieDTO
 {
+    private DateTime dataNastepnegoSzczepienia;
+    public SzczepienieDTO()
+    {
+
+    }
+    public SzczepienieDTO(int iD, DateTime dataNastepnegoSzczepienia)
+    {
+        Id = iD;
+        this.dataNastepnegoSzczepienia = dataNastepnegoSzczepienia;
+    }
 
     public int Id { get; set; }
     public int SzczepienieType { get; set; }
     public DateTime Data { get; set; } // 1 data orientacyjna automat
 
     public DateTime? DataInnyTermin { get; set; } // faktyczna data zatwierdzenia
-    public bool CzyPrzeniesiona { 
-        get { 
-                return DataInnyTermin != null; 
-            } 
+    public bool CzyPrzeniesiona
+    {
+        get
+        {
+            return DataInnyTermin != null;
         }
+    }
 
     public bool CzyOdbyte { get; set; } = false;
 

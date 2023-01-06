@@ -2,7 +2,6 @@
 @using Newtonsoft.Json
 @using PetHelp.Client.Conponent
 @using PetHelp.Client.States
-@using PetHelp.Server.Models
 @using PetHelp.Shared
 @using PetHelp.Shared.DTO
 @using System.Text.Json
@@ -214,27 +213,7 @@
             <div class="profile-box box-szczepienia">
                 <div class="profile-box-title">
                     <div style="width:100%;">
-                        <style>
-                            ul {
-                                display: grid;
-                                grid-template-columns: 1fr repeat(3, auto) 1fr;
-                                justify-items: center;
-                            }
-
-                            li:nth-child(1) {
-                                grid-column-start: 2;
-                            }
-
-                            li:nth-child(4) {
-                                margin-left: auto;
-                            }
-
-                            ul {
-                                padding: 0;
-                                margin: 0;
-                                list-style: none;
-                            }
-                        </style>
+                        
                         <ul>
                             <li></li>
                             <li style="margin-top: auto; margin-bottom: auto;">
@@ -242,50 +221,13 @@
                             </li>
                             <li></li>
                             <li>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                    Karta szczepień
-                                </button>
+                                <Przycisktabeliszczepien listaDostepnychszczepien="listaDostepnychszczepien" zwierz="zwierz" />
                             </li>
                         </ul>
                     </div>
+   
                 </div>
                 <!-- Modal -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Karta Szczepień: @zwierz.Imie</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Data</th>
-                                            <th>Nazwa</th>
-                                            <th>Czy się odbyło</th>
-                                            <th>Czy pierwszy termin</th>
-                                            <th>Inny termin</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach (SzczepienieDTO szczep in zwierz.Lista_Szczepien)
-                                        {
-                                            var _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
-                                            <tr>
-                                                <th>@szczep.Data.ToShortDateString()</th>
-                                                <th>@(_sz == null ? "---" : _sz.Name)</th>
-                                                <th>@szczep.CzyOdbyte</th>
-                                                <th>@szczep.CzyPrzeniesiona</th>
-                                                <th>@(szczep.DataInnyTermin == null ? "---" : szczep.DataInnyTermin.Value.ToShortDateString())</th>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 
                 <div class="profile-box-body">
                     <article>

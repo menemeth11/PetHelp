@@ -1,5 +1,4 @@
-﻿using PetHelp.Server.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PetHelp.Shared.DTO;
 public class ZwierzeDTO
