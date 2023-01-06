@@ -221,7 +221,7 @@
                             </li>
                             <li></li>
                             <li>
-                                <Przycisktabeliszczepien listaDostepnychszczepien="listaDostepnychszczepien" zwierz="zwierz" />
+                               <Przycisktabeliszczepien zwierz="zwierz" />
                             </li>
                         </ul>
                     </div>
@@ -298,7 +298,7 @@
     // Route parameter - distinguish what exactly Zwierze should we download from server by its key Id
     [Parameter] public string ZwierzeId { get; set; }
     // page loacl property for html binding and use in code
-    private ZwierzeDTO zwierz { get; set; } = new();
+    private ZwierzeDTO? zwierz { get; set; } = new();
     // property for keep track of current Zwierz state if its changed or no (used in undo-rever button)
     private bool EditMode { get; set; } = false;
     // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
@@ -306,7 +306,6 @@
     private string dupa = "";
     private long maxFileSize = 5 * 1024 * 1024;
     private Kalendarz Kalendarz;
-    public static List<SzczepienieInfo> listaDostepnychszczepien = new();
 
     string ZwierzeImageUrl
     {
@@ -327,7 +326,7 @@
         {
             // store fetched full ZwierzDTO data into local property allows to render data inside html section
             zwierz = await respond.Content.ReadFromJsonAsync<ZwierzeDTO?>() ?? new();
-            listaDostepnychszczepien = SzczepienieDetale.Szczepienia();
+
             // store this respond in page local variableits allow us to fetch fresh 'unchaged' data
             // whenever its needed for example for reverting changes / undo button
             this._source_Json = await respond.Content.ReadAsStringAsync();

@@ -1,73 +1,78 @@
 ﻿@using PetHelp.Shared
 @using PetHelp.Shared.DTO
 @using static PetHelp.Shared.SzczepienieDetale
-@*<div style="width:100%;">*@
-  
-    
 
-     
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Karta szczepień
-            </button>
-        
-    
-@*</div>*@
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Karta Szczepień: @zwierz.Imie</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Nazwa</th>
-                            <th>Czy się odbyło</th>
-                            <th>Czy pierwszy termin</th>
-                            <th>Inny termin</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (SzczepienieDTO szczep in zwierz.Lista_Szczepien)
-                        {
-                            var _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Karta szczepień
+</button>
+@if (zwierz != null && listaDostepnychszczepien.Any())
+{
+    <div class="modal fade modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Karta Szczepień: @zwierz.Imie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <th>@szczep.Data.ToShortDateString()</th>
-                                <th>@(_sz == null ? "---" : _sz.Name)</th>
-                                <th>@szczep.CzyOdbyte</th>
-                                <th>@szczep.CzyPrzeniesiona</th>
-                                <th>@(szczep.DataInnyTermin == null ? "---" : szczep.DataInnyTermin.Value.ToShortDateString())</th>
+                                <th>Data</th>
+                                <th>Nazwa</th>
+                                <th>Czy się odbyło</th>
+                                <th>Czy drugi termin</th>
+                                <th>Inny termin</th>
                             </tr>
-                        }
-                        @foreach (SzczepienieDTO szczep in listaprzyszlychszczepien)
-                        {
-                            var _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
-                            <tr>
-                                <th>@szczep.Data.ToShortDateString()</th>
-                                <th>@(_sz == null ? "---" : _sz.Name)</th>
-                                <th>@szczep.CzyOdbyte</th>
-                                <th>@szczep.CzyPrzeniesiona</th>
-                                <th>@(szczep.DataInnyTermin == null ? "---" : szczep.DataInnyTermin.Value.ToShortDateString())</th>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (SzczepienieDTO szczep in zwierz.Lista_Szczepien)
+                            {
+                                SzczepienieInfo? _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
+                                <tr>
+                                    <th>@szczep.Data.ToShortDateString()</th>
+                                    <th>@(
+                                        _sz == null ? "---" : _sz.Name
+                                        )</th>
+                                    <th>@szczep.CzyOdbyte</th>
+                                    <th>@szczep.CzyPrzeniesiona</th>
+                                    <th>@(
+                                        szczep.DataInnyTermin == null ? "---" : szczep.DataInnyTermin.Value.ToShortDateString()
+                                        )</th>
+                                </tr>
+                            }
+                            @foreach (SzczepienieDTO szczep in listaprzyszlychszczepien)
+                            {
+                                SzczepienieInfo? _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
+                                <tr>
+                                    <th>@szczep.Data.ToShortDateString()</th>
+                                    <th>@(_sz == null ? "---" : _sz.Name)</th>
+                                    <th>@szczep.CzyOdbyte</th>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
 @code{
-    [Parameter] public ZwierzeDTO zwierz { get; set; } = new();
-    [Parameter] public List<SzczepienieInfo> listaDostepnychszczepien { get; set; } = new();
+    [Parameter] public ZwierzeDTO? zwierz { get; set; } = null;
+
+    public List<SzczepienieInfo> listaDostepnychszczepien { get; set; } = new();
     public List<SzczepienieDTO> listaprzyszlychszczepien { get; set; } = new();
 
     protected override void OnInitialized()
     {
+        listaDostepnychszczepien = SzczepienieDetale.Szczepienia();
+    }
+
+    protected override void OnParametersSet()
+    {
         if (listaprzyszlychszczepien.Count != 0)
             return;
+
         List<SzczepienieDTO> przyszleSzczepienia = new();
         foreach (var rodzaj in listaDostepnychszczepien)
         {
