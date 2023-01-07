@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PetHelp.Server.Data;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
 using PetHelp.Shared.DTO;
@@ -11,18 +10,45 @@ namespace PetHelp.Server.Controllers;
 [ApiController]
 public class SzczepienieController : ControllerBase
 {
-    //private readonly IPosilkiRepository _posilkiRepo;
+    private readonly ISzczepieniaRepository _szczepienieRepo;
 
-    public SzczepienieController(/*IPosilkiRepository posilkiRepo*/)
+    public SzczepienieController(ISzczepieniaRepository posilkiRepo)
     {
-        //_posilkiRepo = posilkiRepo;
+        _szczepienieRepo = posilkiRepo;
     }
 
     [HttpPost("Move")]
     public SzczepienieDTO PrzeniesienieTerminuSzczepienia(ChangeDateRequestDTO data)
     {
+        SzczepienieRecord x = _szczepienieRepo.AktualizujTermin(data.ZwierzId, data.PierwszyTermin, data.NowyTermin, data.SzczepienieId, data.SzczepienieType);
 
-        return new();
+        return new SzczepienieDTO()
+        {
+            Id = x.Id,
+            SzczepienieType = x.SzczepienieType,
+            Data = x.Data,
+            DataInnyTermin = x.DataInnyTermin,
+            CzyOdbyte = x.CzyOdbyte,
+            ZwierzeId = x.ZwierzeId
+        };
     }
-  
+
+    [HttpGet("GetAll/{zwierzeId}")]
+    public List<SzczepienieDTO> GetRegisteredSzczepienia(int zwierzeId)
+    {
+        List<SzczepienieRecord> y = _szczepienieRepo.GetAll(zwierzeId);
+
+        return y.Select(x => 
+            new SzczepienieDTO()
+            {
+                Id = x.Id,
+                SzczepienieType = x.SzczepienieType,
+                Data = x.Data,
+                DataInnyTermin = x.DataInnyTermin,
+                CzyOdbyte = x.CzyOdbyte,
+                ZwierzeId = x.ZwierzeId
+            }).ToList();
+    }
 }
+
+

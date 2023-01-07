@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
+using PetHelp.Shared;
 using PetHelp.Shared.DTO;
 
 
@@ -72,7 +73,8 @@ public class HomeController : ControllerBase
         Zwierze? zwierz = _zwierzeRepo.GetById(zwierzakId);
         if (zwierz is null) return new();
 
-        return new ZwierzeDTO()
+
+        var x = new ZwierzeDTO()
         {
             Id = zwierz.Id,
             Imie = zwierz.Imie,
@@ -106,6 +108,11 @@ public class HomeController : ControllerBase
                 ZwierzeId = x.ZwierzeId,
             }).ToList()
         };
+
+        x.Lista_Szczepien = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, x.DataUrodzenia, x.Lista_Szczepien);
+
+
+        return x;
     }
 
     [HttpPost("DodajZwierze")]
@@ -143,7 +150,6 @@ public class HomeController : ControllerBase
     public void AktualizujZwierze(ZwierzeDTO x)
     {
         _zwierzeRepo.AktualizujZwierze(x);
-        
     }
 
     [HttpDelete("Usun/{idzwierzaka}")]

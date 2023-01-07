@@ -1,22 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MessagePack;
+using Microsoft.EntityFrameworkCore;
 using PetHelp.Server.Data;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
 using PetHelp.Shared;
 using PetHelp.Shared.DTO;
+using PetHelp.Shared.DTO.Requests;
 using static PetHelp.Shared.SzczepienieDetale;
 
 namespace PetHelp.Server.Respositores;
 
 public class SzczepieniaRepository : ISzczepieniaRepository
 {
-    private readonly ApplicationDbContext context;
+    private readonly ApplicationDbContext _context;
 
     public static List<SzczepienieInfo> listaDostepnychszczepien = new();
 
     public SzczepieniaRepository(ApplicationDbContext context)
     {
-        this.context = context;
+        this._context = context;
         listaDostepnychszczepien = SzczepienieDetale.Szczepienia();
     }
 
@@ -58,5 +60,45 @@ public class SzczepieniaRepository : ISzczepieniaRepository
             }
         }
         return listaOdbytychSzczepien;
+    }
+
+    public SzczepienieRecord AktualizujTermin(int ZwierzId, DateTime PierwszyTermin, DateTime NowyTermin, int SzczepienieId, int SzczepienieType)
+    {
+        SzczepienieRecord? item;
+        if (SzczepienieId == 0)
+        {
+            // dodawanie nowego recordu do bazy
+            item = new()
+            {
+                SzczepienieType = SzczepienieType,
+                ZwierzeId = ZwierzId,
+                Data = PierwszyTermin,
+                DataInnyTermin = NowyTermin
+            };
+
+            _context.Szczepienia.Add(item);
+        }
+        else
+        {
+            // aktualizacja istniejacego
+            item = _context.Szczepienia.Find(SzczepienieId);
+            if(item == null)
+            {
+                throw new NullReferenceException($"szczepienie o id {SzczepienieId} nie został znaleziony.");
+            }
+            item.DataInnyTermin = NowyTermin;
+            _context.Update(item);
+        }
+
+        _context.SaveChanges();
+        return item;
+    }
+
+    public List<SzczepienieRecord> GetAll(int zwierzeId)
+    {
+        return _context.Szczepienia
+            .Where(x => x.ZwierzeId == zwierzeId)
+            .AsNoTracking()
+            .ToList();
     }
 }

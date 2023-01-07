@@ -303,14 +303,12 @@
     SzczepienieDTO? przenoszoneSzczepienie = null;
     DateTime? nowyTemin = null;
 
-
-    
-
     private async Task ZmienTerminSzczepienia(){
 
         if(nowyTemin.HasValue && przenoszoneSzczepienie != null)
         {
             ChangeDateRequestDTO body = new() {
+                PierwszyTermin = przenoszoneSzczepienie.Data,
                 NowyTermin = nowyTemin.Value,
                 ZwierzId = PetID,
                 SzczepienieId = przenoszoneSzczepienie.Id,

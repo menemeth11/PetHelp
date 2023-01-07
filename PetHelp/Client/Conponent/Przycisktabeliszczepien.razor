@@ -2,7 +2,9 @@
 @using PetHelp.Shared.DTO
 @using static PetHelp.Shared.SzczepienieDetale
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+@inject HttpClient KlientHTTP;
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="Refresh">
     Karta szczepień
 </button>
 @if (zwierz != null && listaDostepnychszczepien.Any())
@@ -12,7 +14,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Karta Szczepień: @zwierz.Imie</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered">
@@ -29,10 +31,9 @@
                             @foreach (SzczepienieDTO szczep in this.ListaSzczepien)
                             {
                                 SzczepienieInfo? _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
-                            if(szczep.Id != 0)
+                                if(szczep.Id != 0)
                                 {
-                                    
-                                <tr>
+                                    <tr>
                                     <th>@szczep.Data.ToShortDateString()</th>
                                     <th>@(
                                         _sz == null ? "---" : _sz.Name
@@ -84,12 +85,29 @@
 
     protected override void OnParametersSet()
     {
-        if (ListaSzczepien.Count != 0)
-            return;
-
+        if (ListaSzczepien.Count != 0) return;
         if (zwierz == null || zwierz.Id == 0) return;
-        List<SzczepienieDTO> przyszleSzczepienia = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien);
+        List<SzczepienieDTO> szczepienia = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien);
 
-        ListaSzczepien.AddRange(przyszleSzczepienia);
+        ListaSzczepien.AddRange(szczepienia);
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            List<SzczepienieDTO> szczepienia = new();
+            var respond = await KlientHTTP.GetAsync($"Szczepienie/GetAll/{zwierz?.Id}");
+            if (respond.IsSuccessStatusCode)
+            {
+                szczepienia = await respond.Content.ReadFromJsonAsync<List<SzczepienieDTO>>() ?? new();
+            }
+            zwierz.Lista_Szczepien = szczepienia;
+            ListaSzczepien = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }
