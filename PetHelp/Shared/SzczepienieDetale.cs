@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,6 +65,24 @@ namespace PetHelp.Shared
             dataNastepnegoSzczepienia = dataUrodzenia.AddDays(sumaDniDoKolejnegoSzczepienia);
             return new SzczepienieDTO(szczepienie.ID, dataNastepnegoSzczepienia);
 
+        }
+    
+    
+        public static List<SzczepienieDTO> GetMergedSzczepieniaListWithFiveNext(int number, DateTime dataUrodzenia, List<SzczepienieDTO> zarejestrowaneSzczepienia)
+        {
+            List<SzczepienieDTO> przyszleSzczepienia = new();
+            foreach (var rodzaj in Szczepienia())
+            {
+                int odbyteliczba = zarejestrowaneSzczepienia.Count(x => x.SzczepienieType == rodzaj.ID);
+                for (var i = 0; i < number; i++)
+                {
+                    przyszleSzczepienia.Add(SzczepienieDetale.GetNext(rodzaj, odbyteliczba++, dataUrodzenia));
+                }
+            }
+            przyszleSzczepienia = przyszleSzczepienia.OrderBy(x => x.Data).Take(number).ToList();
+            przyszleSzczepienia.AddRange(zarejestrowaneSzczepienia);
+                
+            return przyszleSzczepienia.OrderBy(x => x.Data).ToList();
         }
     }
 }
