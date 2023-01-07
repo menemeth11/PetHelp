@@ -7,7 +7,7 @@
 </button>
 @if (zwierz != null && listaDostepnychszczepien.Any())
 {
-    <div class="modal fade modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -26,9 +26,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (SzczepienieDTO szczep in zwierz.Lista_Szczepien)
+                            @foreach (SzczepienieDTO szczep in this.ListaSzczepien)
                             {
                                 SzczepienieInfo? _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
+                            if(szczep.Id != 0)
+                                {
+                                    
                                 <tr>
                                     <th>@szczep.Data.ToShortDateString()</th>
                                     <th>@(
@@ -39,16 +42,17 @@
                                     <th>@(
                                         szczep.DataInnyTermin == null ? "---" : szczep.DataInnyTermin.Value.ToShortDateString()
                                         )</th>
-                                </tr>
-                            }
-                            @foreach (SzczepienieDTO szczep in listaprzyszlychszczepien)
-                            {
-                                SzczepienieInfo? _sz = listaDostepnychszczepien.Where(x => x.ID == szczep.SzczepienieType).FirstOrDefault();
+                                    </tr>
+                                }
+                                else
+                                {
+                                    
                                 <tr>
                                     <th>@szczep.Data.ToShortDateString()</th>
                                     <th>@(_sz == null ? "---" : _sz.Name)</th>
                                     <th>@szczep.CzyOdbyte</th>
                                 </tr>
+                                }
                             }
                         </tbody>
                     </table>
@@ -61,8 +65,18 @@
     [Parameter] public ZwierzeDTO? zwierz { get; set; } = null;
 
     public List<SzczepienieInfo> listaDostepnychszczepien { get; set; } = new();
-    public List<SzczepienieDTO> listaprzyszlychszczepien { get; set; } = new();
+    public List<SzczepienieDTO> ListaSzczepien { get; set; } = new();
 
+    public List<SzczepienieDTO> GetAllSzczepieniaWithFiveNextElements()
+    {
+        List<SzczepienieDTO> combinedSzczepieniaList = new();
+        if(zwierz != null)
+        {
+            combinedSzczepieniaList.AddRange(zwierz.Lista_Szczepien);
+            combinedSzczepieniaList.AddRange(ListaSzczepien);
+        }
+        return combinedSzczepieniaList;
+    }
     protected override void OnInitialized()
     {
         listaDostepnychszczepien = SzczepienieDetale.Szczepienia();
@@ -70,19 +84,12 @@
 
     protected override void OnParametersSet()
     {
-        if (listaprzyszlychszczepien.Count != 0)
+        if (ListaSzczepien.Count != 0)
             return;
 
-        List<SzczepienieDTO> przyszleSzczepienia = new();
-        foreach (var rodzaj in listaDostepnychszczepien)
-        {
-            int odbyteliczba = zwierz.Lista_Szczepien.Count(x => x.Id == rodzaj.ID);
-            for (var i = 0; i < 5; i++)
-            {
-                przyszleSzczepienia.Add(SzczepienieDetale.GetNext(rodzaj, odbyteliczba++, zwierz.DataUrodzenia));
-            }
-        }
-        przyszleSzczepienia = przyszleSzczepienia.OrderBy(x => x.Data).ToList();
-        listaprzyszlychszczepien.AddRange(przyszleSzczepienia.Take(5));
+        if (zwierz == null || zwierz.Id == 0) return;
+        List<SzczepienieDTO> przyszleSzczepienia = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien);
+
+        ListaSzczepien.AddRange(przyszleSzczepienia);
     }
 }
