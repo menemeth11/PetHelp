@@ -229,34 +229,70 @@
                         <div class="tabler">
                             <div class="rower">
                                 <div class="coler coler_w50">
-                                    Data szczepienia
+                                    Data ostatniego szczepienia
                                 </div>
                                 <div class="coler coler_w50">
-                                    @if (EditMode)
-                                    {
-                                        <input type="date" @bind="zwierz.Szczepienie_Wscieklizna_Data" />
-                                    }
-                                    else
-                                    {
-                                        @(zwierz.Szczepienie_Wscieklizna_Data.HasValue ? zwierz.Szczepienie_Wscieklizna_Data.Value.ToShortDateString() : "Brak daty")
-                                    }
+                                        
+                                    @{
+                                        var x = zwierz.Lista_Szczepien.Where(x => x.CzyOdbyte);
+                                    
+                                        if (x.Any())
+                                        {
+                                            SzczepienieDTO recent = x.First();
+                                            foreach (var sz in x)
+                                            {
+                                                if (recent.CzyPrzeniesiona && sz.CzyPrzeniesiona)
+                                                {
+                                                    if (recent.DataInnyTermin < sz.DataInnyTermin)
+                                                    {
+                                                        recent = sz;
+                                                        continue;
+                                                    }
+                                                }
+                                                if (!recent.CzyPrzeniesiona && !sz.CzyPrzeniesiona)
+                                                {
+                                                    if (recent.Data < sz.Data)
+                                                    {
+                                                        recent = sz;
+                                                        continue;
+                                                    }
+                                                }
+
+                                                if (!recent.CzyPrzeniesiona && sz.CzyPrzeniesiona)
+                                                {
+                                                    if (recent.Data < sz.DataInnyTermin)
+                                                    {
+                                                        recent = sz;
+                                                        continue;
+                                                    }
+                                                }
+                                                if (recent.CzyPrzeniesiona && !sz.CzyPrzeniesiona)
+                                                {
+                                                    if (recent.DataInnyTermin < sz.Data)
+                                                    {
+                                                        recent = sz;
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+
+                                            if(recent.CzyPrzeniesiona && recent.DataInnyTermin.HasValue)
+                                            {
+                                                <div>@(recent.DataInnyTermin.Value.ToShortDateString())</div>
+                                            } 
+                                            else
+                                            {
+                                                <div> @recent.Data.ToShortDateString() </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                                    <div>brak szczepień</div>
+                                        }
+                                       } 
                                 </div>
                             </div>
-                            <div class="rower">
-                                <div class="coler coler_w50">
-                                    Czy zaszczepiony
-                                </div>
-                                <div class="coler coler_w50">
-                                    @if (EditMode)
-                                    {
-                                        <input type="checkbox" @bind="zwierz.Szczepienie_Wscieklizna_Status" />
-                                    }
-                                    else
-                                    {
-                                        @zwierz.Szczepienie_Wscieklizna_Status
-                                    }
-                                </div>
-                            </div>
+                          
                             <div class="rower">
                                 <div class="coler coler_w50">
                                     Następny termin szczepienia

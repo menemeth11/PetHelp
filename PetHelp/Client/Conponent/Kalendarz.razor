@@ -1,6 +1,7 @@
 ﻿@using System.Text
 @using PetHelp.Shared
 @using PetHelp.Shared.DTO
+@using PetHelp.Shared.DTO.Requests
 @using PetHelp.Shared.Enums
 @using System.Linq.Expressions
 @using static PetHelp.Shared.SzczepienieDetale
@@ -130,24 +131,24 @@
                         }
 
                         <div class="meal-container" @onclick="()=>Changecolor(istniejacyPosilek)" style="@SelectedStyle">
-                    <div class="index">@index</div>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Nazwa</td>
-                                <td><input type="text" placeholder="Nazwa posiłku" @bind="istniejacyPosilek.Name" /></td>
-                            </tr>
-                            <tr>
-                                <td>Gramatura</td>
-                                    <td><input type="number" placeholder="Gramatura w gramach" @bind="istniejacyPosilek.Weight" /></td>
-                            </tr>
-                            <tr>
-                                <td>Godzina</td>
-                                <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <div class="index">@index</div>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>Nazwa</td>
+                                        <td><input type="text" placeholder="Nazwa posiłku" @bind="istniejacyPosilek.Name" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gramatura</td>
+                                            <td><input type="number" placeholder="Gramatura w gramach" @bind="istniejacyPosilek.Weight" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Godzina</td>
+                                        <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                 }
                 else
                 {
@@ -200,40 +201,55 @@
                 }
                 @if(todaySzczepienia.Any())
                 {
-                    <table class="table table-bordered" style="margin:0; border-color:#0d6efd;">
-                        <tbody>
-                        @foreach (var item in todaySzczepienia)
-                        {
-                            <tr>
-                                <td>
-                                    @{
-                                        SzczepienieInfo? _sz = SzczepienieDetale.Szczepienia().FirstOrDefault(x => x.ID == item.SzczepienieType);
-                                    }
-                                    <p>Szczepienie: <span style="font-weight:bold; font-size:large;">@(_sz==null?"~błąd~":_sz.Name)</span></p>
-                                    @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.Data == SelectedDay)
-                                    {
-                                        <p style="margin:0;">Przeniesione na dzień <span style="font-weight:bold; font-size:large;">@item.DataInnyTermin.Value.ToShortDateString()</span></p>
-                                    }
-                                    @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.DataInnyTermin == SelectedDay)
-                                    {
-                                        <p style="margin:0;">Przeniesione z dnia <span style="font-weight:bold; font-size:large;">@item.Data.ToShortDateString()</span></p>
-                                    }
-                                    @if(item.CzyOdbyte)
-                                    {
-                                         <p><span style="font-weight:bold; font-size:large;">Odbyte.</span></p>
-                                    }
-                                    @if(item.CzyOdbyte == false)
-                                    {
-                                        <div class="input-group" style="justify-content:space-evenly;">
-                                            <input type="button" class="btn btn-primary" value="Odbyte" disabled="@item.CzyOdbyte" />
-                                            <input type="button" class="btn btn-primary" value="Przenies" disabled="@(item.CzyPrzeniesiona || item.CzyOdbyte)" />
-                                        </div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
+                    @if(przenoszoneSzczepienie == null)
+                    {
+                        <table class="table table-bordered" style="margin:0; border-color:#0d6efd;">
+                            <tbody>
+                            @foreach (var item in todaySzczepienia)
+                            {
+                                <tr>
+                                    <td>
+                                        @{
+                                            SzczepienieInfo? _sz = SzczepienieDetale.Szczepienia().FirstOrDefault(x => x.ID == item.SzczepienieType);
+                                        }
+                                        <p>Szczepienie: <span style="font-weight:bold; font-size:large;">@(_sz==null?"~błąd~":_sz.Name)</span></p>
+                                        @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.Data == SelectedDay)
+                                        {
+                                            <p style="margin:0;">Przeniesione na dzień <span style="font-weight:bold; font-size:large;">@item.DataInnyTermin.Value.ToShortDateString()</span></p>
+                                        }
+                                        @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.DataInnyTermin == SelectedDay)
+                                        {
+                                            <p style="margin:0;">Przeniesione z dnia <span style="font-weight:bold; font-size:large;">@item.Data.ToShortDateString()</span></p>
+                                        }
+                                        @if(item.CzyOdbyte)
+                                        {
+                                             <p><span style="font-weight:bold; font-size:large;">Odbyte.</span></p>
+                                        }
+                                        @if(item.CzyOdbyte == false)
+                                        {
+                                            <div class="input-group" style="justify-content:space-evenly;">
+                                                <input type="button" class="btn btn-primary" value="Odbyte" disabled="@item.CzyOdbyte" />
+                                                <input type="button" class="btn btn-primary" value="Przenies" disabled="@(item.CzyPrzeniesiona || item.CzyOdbyte)"  @onclick="@(e=> PrzesunTeminSzczepienia(e, item))" />
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div style="display:flex;flex-direction:column;height:100%;justify-content: space-between;">
+                            <h4>Przenoszenie Szczepienia</h4>
+                            <div>Początkowa/Orginalna data szczepienia  to: @(przenoszoneSzczepienie.Data.ToShortDateString())</div>
+                            <div>Wybierz na jaki dzień chcesz przełożyć szczepienie: (maksymalny okres przesunięcia to 7 dni) <input type="date" @bind="nowyTemin" /> </div>
+                            <div class="input-group" style="justify-content:space-evenly;">
+                                <input class="btn btn-success" type="button" value="zatwierdź" @onclick="ZmienTerminSzczepienia"/>
+                                <input class="btn btn-warning" type="button" value="anuluj" @onclick="AnulujPrzenoszenieSzczepienia"/>
+                            </div>
+                        </div>
+                    }
                 }
                 else
                 {
@@ -266,8 +282,8 @@
     void ChangeState(MouseEventArgs e, KalendarzStates state)
     {
         _CURRENT = state;
+        AnulujPrzenoszenieSzczepienia();
     }
-
     enum KalendarzStates{
         Posilki,
         Szczepienia
@@ -283,6 +299,55 @@
     DateTime MonthEnd { get; set; }
     const string FULLCIRCLE = "⬤";
     const string EMPTYCIRCLE = "〇";
+
+    SzczepienieDTO? przenoszoneSzczepienie = null;
+    DateTime? nowyTemin = null;
+
+
+    
+
+    private async Task ZmienTerminSzczepienia(){
+
+        if(nowyTemin.HasValue && przenoszoneSzczepienie != null)
+        {
+            ChangeDateRequestDTO body = new() {
+                NowyTermin = nowyTemin.Value,
+                ZwierzId = PetID,
+                SzczepienieId = przenoszoneSzczepienie.Id,
+                SzczepienieType = przenoszoneSzczepienie.SzczepienieType
+            };
+
+            var request = await KlientHTTP.PostAsJsonAsync("Szczepienie/Move", body);
+            if(request.IsSuccessStatusCode)
+            {
+                // aktualizacja aktualnie przechowywanych danych szczepienia o pobrane dane w odpowiedzi
+                SzczepienieDTO item = await request.Content.ReadFromJsonAsync<SzczepienieDTO>()??new();
+
+                //podmianka na zaktualizowane
+                SzczepienieDTO? match = this.ListaSzczepien.FirstOrDefault(x => x.Data == item.Data && x.SzczepienieType == item.SzczepienieType);
+                if(match != null)
+                {
+                    int matchIndex = this.ListaSzczepien.IndexOf(match);
+                    this.ListaSzczepien[matchIndex] = item;
+                }
+            }
+
+            AnulujPrzenoszenieSzczepienia();
+        }
+        else
+        {
+            Console.WriteLine("Wystąpił błąd, termin, lub obiekt szczepienia jest niepoprawy");
+        }
+    }
+
+    private void PrzesunTeminSzczepienia(MouseEventArgs e, SzczepienieDTO item)
+    {
+        przenoszoneSzczepienie = item;
+    }
+    private void AnulujPrzenoszenieSzczepienia()
+    {
+        przenoszoneSzczepienie = null;
+    }
 
     private string GetSzczepienieCSS(DateTime? day)
     {
@@ -418,6 +483,7 @@
         this.SelectedDay = _date;
         this.MonthStart = new DateTime(SelectedDay.Year, SelectedDay.Month, 1);
         this.MonthEnd = new DateTime(SelectedDay.Year, SelectedDay.Month, DateTime.DaysInMonth(SelectedDay.Year, SelectedDay.Month));
+        AnulujPrzenoszenieSzczepienia();
     }
     public async Task OnClick_ChangeCalendarPage(int _number)
     {
