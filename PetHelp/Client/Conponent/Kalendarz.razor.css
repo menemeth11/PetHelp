@@ -66,22 +66,6 @@
     color: #0d6efd;
 }
 
-.szczepienie-odbyte {
-    border-radius: 50%;
-    outline: 2px solid greenyellow;
- 
-}
-.szczepienie-nieOdbyte {
-    border-radius: 50%;
-    outline: 2px solid red;
- 
-}
-.szczepienie-przelozone {
-    border-radius: 50%;
-    outline: 2px solid gray;
- 
-}
-
 .day-other {
     color: #0d6efd;
 }

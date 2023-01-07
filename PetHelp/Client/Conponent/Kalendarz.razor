@@ -1,9 +1,6 @@
 ﻿@using System.Text
-@using PetHelp.Shared
 @using PetHelp.Shared.DTO
 @using PetHelp.Shared.Enums
-@using System.Linq.Expressions
-@using static PetHelp.Shared.SzczepienieDetale
 
 @inject HttpClient KlientHTTP
 
@@ -59,28 +56,7 @@
 
                         @if (_day.HasValue && _day.Value.DayOfWeek == (DayOfWeek)i)
                         {
-                            IEnumerable<SzczepienieDTO> todaySzczepienia = ListaSzczepien.Where(x => MatchDay(x, _day.Value));
-                            string szczepienieCssClass = string.Empty;
-                            if(todaySzczepienia.Any()){
-                                if(todaySzczepienia.All(x=>x.CzyPrzeniesiona))
-                                {
-                                    szczepienieCssClass = "szczepienie-przelozone";
-                                }else if(todaySzczepienia.All(x=>x.CzyOdbyte))
-                                {
-                                    szczepienieCssClass = "szczepienie-odbyte";
-                                }
-                                else if(todaySzczepienia.All(x=>x.CzyOdbyte == false))
-                                {
-                                    szczepienieCssClass = "szczepienie-nieOdbyte";
-                                } 
-                                else
-                                {
-                                    //nie wiem jak zastapic outline borderem 2 kolorowym np czerwono-szarym itp
-                                    szczepienieCssClass = "szczepienie-nieOdbyte";
-                                }
-                            }
-
-                            <td class="@(_day == DateTime.Today?"dzis":String.Empty) day @szczepienieCssClass" @onclick="()=>OnClick_OpenDetails(_day.Value)">
+                            <td class="@(_day == DateTime.Today?"dzis":String.Empty) day" @onclick="()=>OnClick_OpenDetails(_day.Value)">
                                 <div>
                                     @_day.Value.Day
                                 </div>
@@ -129,9 +105,7 @@
     @if(DetailsOn)
     {
         <div class="details-container">
-        @if(_CURRENT == KalendarzStates.Posilki)
-        {
-            <div class="details-content">
+        <div class="details-content">
             @for(int index=1;index<=3;index++)
             {
                 int mealType = index;
@@ -208,65 +182,10 @@
                 }
             }
         </div>
-        }
-        @if(_CURRENT == KalendarzStates.Szczepienia)
-        {
-            <div class="details-content">
-                @{
-                    IEnumerable<SzczepienieDTO> todaySzczepienia = ListaSzczepien.Where(x => MatchDay(x, SelectedDay));
-                }
-                @if(todaySzczepienia.Any())
-                {
-                    <table class="table table-bordered" style="margin:0; border-color:#0d6efd;">
-                        <tbody>
-                        @foreach (var item in todaySzczepienia)
-                        {
-                            <tr>
-                                <td>
-                                    @{
-                                        SzczepienieInfo? _sz = SzczepienieDetale.Szczepienia().FirstOrDefault(x => x.ID == item.SzczepienieType);
-                                    }
-                                    <p>Szczepienie: <span style="font-weight:bold; font-size:large;">@(_sz==null?"~błąd~":_sz.Name)</span></p>
-                                    @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue)
-                                    {
-                                        <p style="margin:0;">Przeniesione na dzień <span style="font-weight:bold; font-size:large;">@item.DataInnyTermin.Value.ToShortDateString()</span></p>
-                                    }
-                                    @if(item.CzyOdbyte)
-                                    {
-                                         <p><span style="font-weight:bold; font-size:large;">Odbyte.</span></p>
-                                    }
-                                    @if(item.CzyOdbyte == false)
-                                    {
-                                        <div class="input-group" style="justify-content:space-evenly;">
-                                            <input type="button" class="btn btn-primary" value="Odbyte" disabled="@item.CzyOdbyte" />
-                                            <input type="button" class="btn btn-primary" value="Przenies" disabled="@(item.CzyPrzeniesiona || item.CzyOdbyte)" />
-                                        </div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <p style="width:100%; text-align:center; font-size:large; ">Brak zaplanowanych szczepień.</p>
-                }
-            </div>
-        }
-
         <div class="details-buttons">
-            <div style="width: 100%;"></div>
-            @if(_CURRENT == KalendarzStates.Posilki)
-            {
-                <button class="btn btn-outline-success" @onclick="Zapisz">Zapisz</button>
+            <button class="btn btn-outline-success" @onclick="Zapisz">Zapisz</button>
                 <button class="btn btn-outline-danger" @onclick=Wyczysc>Wyczyść</button>
-                <button class="btn btn-outline-dark" @onclick=@(e => ChangeState(e, KalendarzStates.Szczepienia))>Szczepienia</button>
-            }
-            else if(_CURRENT == KalendarzStates.Szczepienia)
-            {
-                <button class="btn btn-outline-dark" @onclick=@(e => ChangeState(e, KalendarzStates.Posilki))>Posilki</button>
-            }
+            <div style="width: 100%;"></div>
             <button class="btn btn-outline-primary" @onclick="()=>DetailsOn = false">Wróć</button>
         </div>
     </div>
@@ -275,17 +194,6 @@
 
 @code{
     [Parameter] public int PetID { get; set; }
-    public List<SzczepienieDTO> ListaSzczepien { get; set; } = new();
-    void ChangeState(MouseEventArgs e, KalendarzStates state)
-    {
-        _CURRENT = state;
-    }
-
-    enum KalendarzStates{
-        Posilki,
-        Szczepienia
-    }
-    KalendarzStates _CURRENT { get; set; } = KalendarzStates.Posilki;
 
     List<MealRecordDTO> NowePosilki = new();
     List<MealRecordDTO> Posilki = new();
@@ -297,18 +205,6 @@
     const string FULLCIRCLE = "⬤";
     const string EMPTYCIRCLE = "〇";
 
-    protected override async Task OnParametersSetAsync()
-    {
-        this.Posilki = await GetMeals(PetID, DateTime.Now);
-        RefreshSelectedDate(DateTime.Now);
-    }
-
-    public void SetListaSzczepien(List<SzczepienieDTO> _lista)
-    {
-        this.ListaSzczepien = _lista;
-        StateHasChanged();
-    }
-
     public bool MatchDay(MealRecordDTO x, int mealType, DateTime SelectedDay)
     {
         return x.Date.Day == SelectedDay.Day &&
@@ -316,19 +212,8 @@
                x.Date.Year == SelectedDay.Year &&
                x.Type == mealType;
     }
-    public bool MatchDay(SzczepienieDTO _x, DateTime _date)
-    {
-        bool regularDateCheck = false, otherDateCheck = false;
 
-        regularDateCheck = (_x.Data.Year == _date.Year && _x.Data.Month == _date.Month && _x.Data.Day == _date.Day);
-
-        if(_x.CzyPrzeniesiona && _x.DataInnyTermin.HasValue)
-            otherDateCheck = (_x.DataInnyTermin.Value.Year == _date.Year && _x.DataInnyTermin.Value.Month == _date.Month && _x.DataInnyTermin.Value.Day == _date.Day);
-
-        return regularDateCheck == true || otherDateCheck == true;
-    }
-
-    void HandleDateConversion(ChangeEventArgs args, MealRecordDTO _nowyPosilek)
+    private void HandleDateConversion(ChangeEventArgs args, MealRecordDTO _nowyPosilek)
     {
         _nowyPosilek.Date = default;
         if(args.Value != null)
@@ -339,7 +224,8 @@
             }
         }
     }
-    void NewMeal(DateTime _day, int _type)
+
+    private void NewMeal(DateTime _day, int _type)
     {
         MealRecordDTO posilek = new(MealRecordDTO.States.Added)
         {
@@ -353,6 +239,7 @@
 
         StateHasChanged();
     }
+
     public async Task Zapisz()
     {
         List<Task> _Tasks = new();
@@ -371,7 +258,7 @@
         }
         await Task.WhenAll(_Tasks.ToArray());
     }
-    async Task Dodaj()
+    private async Task Dodaj()
     {
         var body = NowePosilki.Where(x => x.Date != default).ToList();
         Console.WriteLine($"Dodawanie {body.Count} wposów do kalendarza");
@@ -386,7 +273,7 @@
             }
         }
     }
-    async Task Aktualizuj()
+    private async Task Aktualizuj()
     {
         var body = this.Posilki.Where(x => x.CurrentState == MealRecordDTO.States.Updated).ToList();
         Console.WriteLine($"Aktualizowanie {body.Count} wposów do kalendarza");
@@ -396,18 +283,27 @@
             body.ForEach(x => x.SetState(MealRecordDTO.States.None));
         }
     }
+
     public static Dictionary<int, string> MiesiaceDict = new()
     {
         {1,"Styczeń"},{2,"Luty"},{3,"Marzec"},{4,"Kwiecień"},
         {5,"Maj"},{6,"Czerwiec"},{7,"Lipiec"},{8,"Sierpień"},
         {9,"Wrzesień"},{10,"Październik"},{11,"Listopad"},{12,"Grudzień"}
     };
-    void RefreshSelectedDate(DateTime _date)
+
+    protected override async Task OnParametersSetAsync()
+    {
+        this.Posilki = await GetMeals(PetID, DateTime.Now);
+        RefreshSelectedDate(DateTime.Now);
+    }
+
+    private void RefreshSelectedDate(DateTime _date)
     {
         this.SelectedDay = _date;
         this.MonthStart = new DateTime(SelectedDay.Year, SelectedDay.Month, 1);
         this.MonthEnd = new DateTime(SelectedDay.Year, SelectedDay.Month, DateTime.DaysInMonth(SelectedDay.Year, SelectedDay.Month));
     }
+
     public async Task OnClick_ChangeCalendarPage(int _number)
     {
         DateTime newDate = this.DetailsOn?this.SelectedDay.AddDays(_number):this.SelectedDay.AddMonths(_number);
@@ -420,12 +316,14 @@
         RefreshSelectedDate(newDate);
         StateHasChanged();
     }
-    void OnClick_OpenDetails(DateTime _day)
+
+    private void OnClick_OpenDetails(DateTime _day)
     {
         RefreshSelectedDate(_day);
         this.DetailsOn = true;
     }
-    async Task<List<MealRecordDTO>> GetMeals(int _petId, DateTime _day)
+
+    private async Task<List<MealRecordDTO>> GetMeals(int _petId, DateTime _day)
     {
         var respond = await KlientHTTP.GetAsync($"Meal/{_day.Year}-{_day.Month}/{_petId}");
         if (respond.IsSuccessStatusCode)
@@ -438,7 +336,8 @@
         Console.WriteLine($"Brak zarejestrowanych posiłków dla {MiesiaceDict[_day.Month]} {_day.Year}r.");
         return new();
     }
-    string PrintCircles(List<MealRecordDTO> _posilki)
+
+    private string PrintCircles(List<MealRecordDTO> _posilki)
     {
         char xxx = Convert.ToChar(FULLCIRCLE);
 
@@ -450,7 +349,8 @@
 
         return sb.ToString();
     }
-    async Task Wyczysc()
+
+    private async Task Wyczysc()
     {
         List<MealRecordDTO> dowyczyszczenia = new();
         foreach(var x in NowePosilki)
@@ -472,7 +372,7 @@
         Posilki = Posilki.Except(Posilki.Where(x => x.isSelected)).ToList();
 
     }
-    void Changecolor(MealRecordDTO? pudelko)
+    private void Changecolor(MealRecordDTO? pudelko)
     {
         if (pudelko == null) return; 
 

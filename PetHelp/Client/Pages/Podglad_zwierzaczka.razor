@@ -31,10 +31,7 @@
                     <InputFile id="uploadBtn1" OnChange="@LoadFile" style="display:none;" />
                 }
             </div>
-            @if(TabelaSzczepien != null && zwierz.Id != 0)
-            {
-                <Kalendarz @ref="@Kalendarz" PetID="zwierz.Id"/>
-            }
+            <Kalendarz @ref="Kalendarz" PetID="zwierz.Id"/>
         </div>
         
         <div class="profile-column">
@@ -81,7 +78,14 @@
                                     Umaszczenie
                                 </div>
                                 <div class="coler coler_w50">
-                                        @zwierz.Umaszczenie                            
+                                    @*      @if (EditMode)
+                                    {
+                                    <input type="text" @bind="zwierz.Umaszczenie" />
+                                    }
+                                    else*@
+                                    
+                                        @zwierz.Umaszczenie
+                                    
                                 </div>
                             </div>
                             <div class="rower">
@@ -217,7 +221,7 @@
                             </li>
                             <li></li>
                             <li>
-                               <Przycisktabeliszczepien @ref="TabelaSzczepien" zwierz="zwierz" ></Przycisktabeliszczepien>
+                               <Przycisktabeliszczepien zwierz="zwierz" />
                             </li>
                         </ul>
                     </div>
@@ -301,8 +305,7 @@
     private string _source_Json { get; set; }
     private string dupa = "";
     private long maxFileSize = 5 * 1024 * 1024;
-    private Kalendarz? Kalendarz;
-    private Przycisktabeliszczepien? TabelaSzczepien;
+    private Kalendarz Kalendarz;
 
     string ZwierzeImageUrl
     {
@@ -323,6 +326,7 @@
         {
             // store fetched full ZwierzDTO data into local property allows to render data inside html section
             zwierz = await respond.Content.ReadFromJsonAsync<ZwierzeDTO?>() ?? new();
+
             // store this respond in page local variableits allow us to fetch fresh 'unchaged' data
             // whenever its needed for example for reverting changes / undo button
             this._source_Json = await respond.Content.ReadAsStringAsync();
@@ -361,15 +365,6 @@
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to load JS module. Error: {ex}");
-            }
-
-        }
-        if(this.Kalendarz != null && this.zwierz?.Id != 0)
-        {
-            if(this.Kalendarz.ListaSzczepien.Any() == false)
-            {
-                // init pierwsze zaladowanie danych do klaendarza dotyczacych szczepien, 
-                this.Kalendarz.SetListaSzczepien(SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien));
             }
         }
     }
