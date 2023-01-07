@@ -59,26 +59,7 @@
 
                         @if (_day.HasValue && _day.Value.DayOfWeek == (DayOfWeek)i)
                         {
-                            IEnumerable<SzczepienieDTO> todaySzczepienia = ListaSzczepien.Where(x => MatchDay(x, _day.Value));
-                            string szczepienieCssClass = string.Empty;
-                            if(todaySzczepienia.Any()){
-                                if(todaySzczepienia.All(x=>x.CzyPrzeniesiona))
-                                {
-                                    szczepienieCssClass = "szczepienie-przelozone";
-                                }else if(todaySzczepienia.All(x=>x.CzyOdbyte))
-                                {
-                                    szczepienieCssClass = "szczepienie-odbyte";
-                                }
-                                else if(todaySzczepienia.All(x=>x.CzyOdbyte == false))
-                                {
-                                    szczepienieCssClass = "szczepienie-nieOdbyte";
-                                } 
-                                else
-                                {
-                                    //nie wiem jak zastapic outline borderem 2 kolorowym np czerwono-szarym itp
-                                    szczepienieCssClass = "szczepienie-nieOdbyte";
-                                }
-                            }
+                            string szczepienieCssClass = GetSzczepienieCSS(_day);
 
                             <td class="@(_day == DateTime.Today?"dzis":String.Empty) day @szczepienieCssClass" @onclick="()=>OnClick_OpenDetails(_day.Value)">
                                 <div>
@@ -107,7 +88,9 @@
 
                     @if(_day_niedziela.HasValue && _day_niedziela.Value.DayOfWeek == DayOfWeek.Sunday)
                     {
-                        <td class="@(_day_niedziela == DateTime.Today?"dzis":String.Empty) day niedziela " @onclick="()=>OnClick_OpenDetails(_day_niedziela.Value)">
+                        string szczepienieCssClass = GetSzczepienieCSS(_day_niedziela);
+
+                        <td class="@(_day_niedziela == DateTime.Today?"dzis":String.Empty) day niedziela @szczepienieCssClass" @onclick="()=>OnClick_OpenDetails(_day_niedziela.Value)">
                             <div>
                                 @_day_niedziela.Value.Day
                             </div>
@@ -227,9 +210,13 @@
                                         SzczepienieInfo? _sz = SzczepienieDetale.Szczepienia().FirstOrDefault(x => x.ID == item.SzczepienieType);
                                     }
                                     <p>Szczepienie: <span style="font-weight:bold; font-size:large;">@(_sz==null?"~błąd~":_sz.Name)</span></p>
-                                    @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue)
+                                    @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.Data == SelectedDay)
                                     {
                                         <p style="margin:0;">Przeniesione na dzień <span style="font-weight:bold; font-size:large;">@item.DataInnyTermin.Value.ToShortDateString()</span></p>
+                                    }
+                                    @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.DataInnyTermin == SelectedDay)
+                                    {
+                                        <p style="margin:0;">Przeniesione z dnia <span style="font-weight:bold; font-size:large;">@item.Data.ToShortDateString()</span></p>
                                     }
                                     @if(item.CzyOdbyte)
                                     {
@@ -250,7 +237,7 @@
                 }
                 else
                 {
-                    <p style="width:100%; text-align:center; font-size:large; ">Brak zaplanowanych szczepień.</p>
+                    <p style="width:100%; text-align:center; font-size:large;">Brak zaplanowanych szczepień.</p>
                 }
             </div>
         }
@@ -297,6 +284,30 @@
     const string FULLCIRCLE = "⬤";
     const string EMPTYCIRCLE = "〇";
 
+    private string GetSzczepienieCSS(DateTime? day)
+    {
+        string szczepienieCssClass = string.Empty;
+        IEnumerable<SzczepienieDTO> todaySzczepienia = ListaSzczepien.Where(x => MatchDay(x, day.Value));
+        if(todaySzczepienia.Any()){
+            if(todaySzczepienia.All(x=>x.CzyPrzeniesiona) && todaySzczepienia.Any(x=>x.DataInnyTermin != day))
+            {
+                szczepienieCssClass = "szczepienie-przelozone";
+            }else if(todaySzczepienia.All(x=>x.CzyOdbyte))
+            {
+                szczepienieCssClass = "szczepienie-odbyte";
+            }
+            else if(todaySzczepienia.All(x=>x.CzyOdbyte == false))
+            {
+                szczepienieCssClass = "szczepienie-nieOdbyte";
+            } 
+            else
+            {
+                //nie wiem jak zastapic outline borderem 2 kolorowym np czerwono-szarym itp
+                szczepienieCssClass = "szczepienie-nieOdbyte";
+            }
+        }
+        return szczepienieCssClass;
+    }
     protected override async Task OnParametersSetAsync()
     {
         this.Posilki = await GetMeals(PetID, DateTime.Now);

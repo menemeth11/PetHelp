@@ -31,10 +31,9 @@
                     <InputFile id="uploadBtn1" OnChange="@LoadFile" style="display:none;" />
                 }
             </div>
-            @if(TabelaSzczepien != null && zwierz.Id != 0)
-            {
-                <Kalendarz @ref="@Kalendarz" PetID="zwierz.Id"/>
-            }
+
+            <Kalendarz @ref="@Kalendarz" PetID="zwierz.Id"/>
+
         </div>
         
         <div class="profile-column">
