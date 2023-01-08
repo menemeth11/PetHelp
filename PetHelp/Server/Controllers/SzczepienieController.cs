@@ -49,6 +49,25 @@ public class SzczepienieController : ControllerBase
                 ZwierzeId = x.ZwierzeId
             }).ToList();
     }
+    [HttpGet("Zatwierdz/{zwierzId}/{szczepienieId}")]
+    public SzczepienieDTO Zatwierdz(int zwierzId, int szczepienieId)
+    {
+        SzczepienieRecord? item = _szczepienieRepo.Zatwierdz(zwierzId, szczepienieId);
+
+        if(item != null)
+        {
+            return new SzczepienieDTO() {
+                Id = item.Id,
+                SzczepienieType = item.SzczepienieType,
+                Data = item.Data,
+                DataInnyTermin = item.DataInnyTermin,
+                CzyOdbyte = item.CzyOdbyte,
+                ZwierzeId = item.ZwierzeId
+            };
+        }
+
+        throw new NullReferenceException($"Błąd zatwierdzania szczepienia, nie znaleziono obiektu id {szczepienieId}");
+    }
 }
 
 

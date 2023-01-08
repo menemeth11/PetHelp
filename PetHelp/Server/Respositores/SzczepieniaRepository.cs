@@ -101,4 +101,19 @@ public class SzczepieniaRepository : ISzczepieniaRepository
             .AsNoTracking()
             .ToList();
     }
+
+    public SzczepienieRecord? Zatwierdz(int zwierzeId, int szczepienieId)
+    {
+        SzczepienieRecord? item = _context.Szczepienia.Find(szczepienieId);
+
+        if(item != null)
+        {
+            item.CzyOdbyte = true;
+            _context.Update(item);
+            _context.SaveChanges();
+        }
+
+        return item;
+
+    }
 }

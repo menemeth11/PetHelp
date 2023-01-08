@@ -205,7 +205,7 @@
                     {
                         <table class="table table-bordered" style="margin:0; border-color:#0d6efd;">
                             <tbody>
-                            @foreach (var item in todaySzczepienia)
+                            @foreach (SzczepienieDTO item in todaySzczepienia)
                             {
                                 <tr>
                                     <td>
@@ -213,14 +213,36 @@
                                             SzczepienieInfo? _sz = SzczepienieDetale.Szczepienia().FirstOrDefault(x => x.ID == item.SzczepienieType);
                                         }
                                         <p>Szczepienie: <span style="font-weight:bold; font-size:large;">@(_sz==null?"~błąd~":_sz.Name)</span></p>
-                                        @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.Data == SelectedDay)
+                                        @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && CompareDated(item.Data,SelectedDay))
                                         {
                                             <p style="margin:0;">Przeniesione na dzień <span style="font-weight:bold; font-size:large;">@item.DataInnyTermin.Value.ToShortDateString()</span></p>
                                         }
-                                        @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && item.DataInnyTermin == SelectedDay)
+                                                @{
+                                                    bool CompareDated(DateTime one, DateTime two)
+                                                    {
+                                                        if (one.Year != two.Year)
+                                                        {
+                                                            return false;
+                                                        }
+                                                        if (one.Month != two.Month)
+                                                        {
+                                                            return false;
+                                                        }
+                                                        if (one.Day != two.Day)
+                                                        {
+                                                            return false;
+                                                        }
+
+                                                        return true;
+                                                    }
+                                                }
+                                        @if(item.CzyPrzeniesiona && item.DataInnyTermin.HasValue && CompareDated(item.DataInnyTermin.Value,SelectedDay))
                                         {
+
                                             <p style="margin:0;">Przeniesione z dnia <span style="font-weight:bold; font-size:large;">@item.Data.ToShortDateString()</span></p>
                                         }
+
+
                                         @if(item.CzyOdbyte)
                                         {
                                              <p><span style="font-weight:bold; font-size:large;">Odbyte.</span></p>
@@ -228,7 +250,7 @@
                                         @if(item.CzyOdbyte == false)
                                         {
                                             <div class="input-group" style="justify-content:space-evenly;">
-                                                <input type="button" class="btn btn-primary" value="Odbyte" disabled="@item.CzyOdbyte" />
+                                                <input type="button" class="btn btn-primary" value="Odbyte" disabled="@item.CzyOdbyte" @onclick=@(e=> ZatwierdzSzczepienia(e, item)) />
                                                 <input type="button" class="btn btn-primary" value="Przenies" disabled="@(item.CzyPrzeniesiona || item.CzyOdbyte)"  @onclick="@(e=> PrzesunTeminSzczepienia(e, item))" />
                                             </div>
                                         }
@@ -278,6 +300,8 @@
 
 @code{
     [Parameter] public int PetID { get; set; }
+    [Parameter] public EventCallback<List<SzczepienieDTO>> OnListaChangedCallback {get; set;}
+
     public List<SzczepienieDTO> ListaSzczepien { get; set; } = new();
     void ChangeState(MouseEventArgs e, KalendarzStates state)
     {
@@ -301,7 +325,37 @@
     const string EMPTYCIRCLE = "〇";
 
     SzczepienieDTO? przenoszoneSzczepienie = null;
-    DateTime? nowyTemin = null;
+    private DateTime? _nowyTermin;
+    DateTime? nowyTemin 
+    { 
+        get => _nowyTermin; 
+        set
+        {
+            if(value == null){
+                _nowyTermin = null;
+                return;
+            }
+            if(przenoszoneSzczepienie != null) {
+                _nowyTermin = new DateTime();
+                TimeSpan x = value.Value - przenoszoneSzczepienie.Data;
+                DateTime orginalnyCzas = przenoszoneSzczepienie.Data;
+                if(x.Days >= 7)
+                {
+                    _nowyTermin = orginalnyCzas.AddDays(7);
+                    return;
+                }
+                else if( x.Days <= -7)
+                {
+                    _nowyTermin = orginalnyCzas.AddDays(-7);
+                    return;
+                }
+                else
+                {
+                    _nowyTermin = value;
+                }
+            }
+        }
+    }
 
     private async Task ZmienTerminSzczepienia(){
 
@@ -331,6 +385,7 @@
             }
 
             AnulujPrzenoszenieSzczepienia();
+            await OnListaChangedCallback.InvokeAsync(this.ListaSzczepien);
         }
         else
         {
@@ -338,6 +393,23 @@
         }
     }
 
+    private async Task ZatwierdzSzczepienia(MouseEventArgs e, SzczepienieDTO item)
+    {
+
+            SzczepienieDTO? updatedItem = await KlientHTTP.GetFromJsonAsync<SzczepienieDTO>($"Szczepienie/Zatwierdz/{PetID}/{item.Id}");
+            if(updatedItem != null)
+            {
+                SzczepienieDTO? match = this.ListaSzczepien.FirstOrDefault(x => x.Data == updatedItem.Data && x.SzczepienieType == updatedItem.SzczepienieType);
+                if(match != null)
+                {
+                    int matchIndex = this.ListaSzczepien.IndexOf(match);
+                    this.ListaSzczepien[matchIndex] = updatedItem;
+                }
+            }
+
+            AnulujPrzenoszenieSzczepienia();
+            await OnListaChangedCallback.InvokeAsync(this.ListaSzczepien);
+    }
     private void PrzesunTeminSzczepienia(MouseEventArgs e, SzczepienieDTO item)
     {
         przenoszoneSzczepienie = item;

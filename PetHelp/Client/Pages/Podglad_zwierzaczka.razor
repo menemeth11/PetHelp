@@ -32,7 +32,7 @@
                 }
             </div>
 
-            <Kalendarz @ref="@Kalendarz" PetID="zwierz.Id"/>
+            <Kalendarz @ref="@Kalendarz" PetID="zwierz.Id" OnListaChangedCallback=@RefreshListaSzczepien/>
 
         </div>
         
@@ -433,6 +433,12 @@
             // whenever its needed for example for reverting changes / undo button
             this._source_Json = await respond.Content.ReadAsStringAsync();
         }
+    }
+
+    public void RefreshListaSzczepien(List<SzczepienieDTO> updatedList)
+    {
+        zwierz.Lista_Szczepien = updatedList;
+        //StateHasChanged();
     }
     private void BackToLiat()
     {
