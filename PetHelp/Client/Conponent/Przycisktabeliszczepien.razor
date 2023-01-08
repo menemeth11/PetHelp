@@ -87,7 +87,7 @@
     {
         if (ListaSzczepien.Count != 0) return;
         if (zwierz == null || zwierz.Id == 0) return;
-        List<SzczepienieDTO> szczepienia = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien);
+        List<SzczepienieDTO> szczepienia = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien, zwierz.Id);
 
         ListaSzczepien.AddRange(szczepienia);
     }
@@ -103,7 +103,7 @@
                 szczepienia = await respond.Content.ReadFromJsonAsync<List<SzczepienieDTO>>() ?? new();
             }
             zwierz.Lista_Szczepien = szczepienia;
-            ListaSzczepien = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien);
+            ListaSzczepien = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien, zwierz.Id);
         }
         catch (Exception ex)
         {

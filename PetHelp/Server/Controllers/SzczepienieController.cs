@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Crmf;
 using PetHelp.Server.Interfaces;
 using PetHelp.Server.Models;
 using PetHelp.Shared.DTO;
@@ -49,10 +50,11 @@ public class SzczepienieController : ControllerBase
                 ZwierzeId = x.ZwierzeId
             }).ToList();
     }
-    [HttpGet("Zatwierdz/{zwierzId}/{szczepienieId}")]
-    public SzczepienieDTO Zatwierdz(int zwierzId, int szczepienieId)
-    {
-        SzczepienieRecord? item = _szczepienieRepo.Zatwierdz(zwierzId, szczepienieId);
+
+    [HttpPost("Zatwierdz")]
+    public SzczepienieDTO Zatwierdz(SzczepienieDTO model)
+    {  
+        SzczepienieRecord? item = _szczepienieRepo.Zatwierdz(model);
 
         if(item != null)
         {
@@ -66,8 +68,8 @@ public class SzczepienieController : ControllerBase
             };
         }
 
-        throw new NullReferenceException($"Błąd zatwierdzania szczepienia, nie znaleziono obiektu id {szczepienieId}");
+        throw new NullReferenceException($"Błąd zatwierdzania szczepienia");
     }
-}
 
+}
 

@@ -102,18 +102,29 @@ public class SzczepieniaRepository : ISzczepieniaRepository
             .ToList();
     }
 
-    public SzczepienieRecord? Zatwierdz(int zwierzeId, int szczepienieId)
+    public SzczepienieRecord? Zatwierdz(SzczepienieDTO model)
     {
-        SzczepienieRecord? item = _context.Szczepienia.Find(szczepienieId);
+        SzczepienieRecord? item = _context.Szczepienia.Find(model.Id);
 
         if(item != null)
         {
             item.CzyOdbyte = true;
             _context.Update(item);
-            _context.SaveChanges();
+        }
+        else
+        {
+            item = new SzczepienieRecord
+            {
+                CzyOdbyte = true,
+                Data = model.Data,
+                ZwierzeId = model.ZwierzeId,
+                DataInnyTermin = model.DataInnyTermin,
+                SzczepienieType = model.SzczepienieType
+            };
+            _context.Add(item);
         }
 
+        _context.SaveChanges();
         return item;
-
     }
 }

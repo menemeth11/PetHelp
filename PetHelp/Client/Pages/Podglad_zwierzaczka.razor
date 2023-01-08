@@ -481,7 +481,7 @@
             if(this.Kalendarz.ListaSzczepien.Any() == false)
             {
                 // init pierwsze zaladowanie danych do klaendarza dotyczacych szczepien, 
-                this.Kalendarz.SetListaSzczepien(SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien));
+                this.Kalendarz.SetListaSzczepien(SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien, zwierz.Id));
             }
         }
     }

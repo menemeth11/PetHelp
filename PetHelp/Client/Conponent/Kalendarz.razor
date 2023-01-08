@@ -318,7 +318,7 @@
     List<MealRecordDTO> Posilki = new();
 
     bool DetailsOn = false;
-    DateTime SelectedDay { get; set; } = default;
+    DateTime SelectedDay { get; set; }
     DateTime MonthStart { get; set; }
     DateTime MonthEnd { get; set; }
     const string FULLCIRCLE = "⬤";
@@ -395,20 +395,25 @@
 
     private async Task ZatwierdzSzczepienia(MouseEventArgs e, SzczepienieDTO item)
     {
+        var request = await KlientHTTP.PostAsJsonAsync($"Szczepienie/Zatwierdz", item);
+        if(request.IsSuccessStatusCode)
+        {
+            SzczepienieDTO updatedItem = await request.Content.ReadFromJsonAsync<SzczepienieDTO>()??new();
 
-            SzczepienieDTO? updatedItem = await KlientHTTP.GetFromJsonAsync<SzczepienieDTO>($"Szczepienie/Zatwierdz/{PetID}/{item.Id}");
-            if(updatedItem != null)
+            SzczepienieDTO? match = this.ListaSzczepien.FirstOrDefault(x => x.Data == updatedItem.Data && x.SzczepienieType == updatedItem.SzczepienieType);
+            if(match != null)
             {
-                SzczepienieDTO? match = this.ListaSzczepien.FirstOrDefault(x => x.Data == updatedItem.Data && x.SzczepienieType == updatedItem.SzczepienieType);
-                if(match != null)
-                {
-                    int matchIndex = this.ListaSzczepien.IndexOf(match);
-                    this.ListaSzczepien[matchIndex] = updatedItem;
-                }
+                int matchIndex = this.ListaSzczepien.IndexOf(match);
+                this.ListaSzczepien[matchIndex] = updatedItem;
             }
 
             AnulujPrzenoszenieSzczepienia();
             await OnListaChangedCallback.InvokeAsync(this.ListaSzczepien);
+        }
+        else
+        {
+            throw new Exception("Błąd pobierania zatwierdzonego obiektu szczepienia z serwera.");
+        }
     }
     private void PrzesunTeminSzczepienia(MouseEventArgs e, SzczepienieDTO item)
     {

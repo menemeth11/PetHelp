@@ -109,7 +109,7 @@ public class HomeController : ControllerBase
             }).ToList()
         };
 
-        x.Lista_Szczepien = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, x.DataUrodzenia, x.Lista_Szczepien);
+        x.Lista_Szczepien = SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, x.DataUrodzenia, x.Lista_Szczepien, x.Id);
 
 
         return x;
