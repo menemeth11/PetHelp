@@ -47,7 +47,7 @@
             </tr>
         </thead>
         <tbody>
-            @for (int d = 1; d <= MonthEnd.Day; )
+            @*@for (int d = 1; d <= MonthEnd.Day; )
             {
                 <tr>
                     @for (int i = 1; i <= 6; i++)
@@ -107,7 +107,43 @@
                     }
                 </tr>
 
+            }*@
+            @for (int d = 1; d <= MonthEnd.Day;)
+            {
+                <tr>
+                    @for (int i = 1; i <= 7; i++)
+                    {
+                        int dayIndex = i == 7 ? 0 : i;
+
+                        DateTime? _day = null;
+                        @if (d <= this.MonthEnd.Day)
+                        {
+                            _day = new DateTime(MonthEnd.Year, MonthEnd.Month, d);
+                        }
+
+                        @if (_day.HasValue && _day.Value.DayOfWeek == (DayOfWeek)dayIndex)
+                        {
+                            string szczepienieCssClass = GetSzczepienieCSS(_day);
+
+                            <td class="@(_day == DateTime.Today?"dzis":String.Empty) @(dayIndex == 0?"niedziela":"day") @szczepienieCssClass" @onclick="()=>OnClick_OpenDetails(_day.Value)">
+                                <div>
+                                    @_day.Value.Day
+                                </div>
+                                <div style="margin-bottom:3px; font-size:8px;">
+                                    @(PrintCircles(this.Posilki.Where(x => x.Date.Year == _day.Value.Year && x.Date.Day == _day.Value.Day).ToList()))
+                                </div>
+                            </td>
+                            d++;
+                        }
+                        else
+                        {
+                            <td class="day-other"> - </td>
+                            continue;
+                        }
+                    }
+                </tr>
             }
+
         </tbody>
     </table>
     @if(DetailsOn)
@@ -144,7 +180,8 @@
                                     </tr>
                                     <tr>
                                         <td>Godzina</td>
-                                        <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
+                                        <td><input type="time" placeholder="Godzina podania" value="@istniejacyPosilek.Date.ToShortTimeString()"  
+                                            @onchange="(args) => HandleDateConversion(args, istniejacyPosilek)" style="height: 22px;" /></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -164,7 +201,9 @@
                         @if(_nowyPosilek == null)
                         {
                             <div style="display: flex;width:100%;height:100%;">
-                                <input class="btn btn-outline-dark" style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto;" hidden="@(_nowyPosilek != null)" type="button" value="dodaj" @onclick="()=>NewMeal(this.SelectedDay,mealType)" />
+                                <input class="btn btn-outline-dark" 
+                                style="margin-top:auto; margin-bottom:auto; margin-left:auto; margin-right:auto;" 
+                                hidden="@(_nowyPosilek != null)" type="button" value="dodaj" @onclick="()=>NewMeal(this.SelectedDay,mealType)" />
                             </div>
                         }
                         @if(_nowyPosilek != null)
@@ -182,7 +221,8 @@
                                     <tr>
                                         <td>Godzina</td>
                                         <td>
-                                                <input type="time" placeholder="Godzina podania" value="@_nowyPosilek.Date.ToShortTimeString()" @onchange="(args) => HandleDateConversion(args, _nowyPosilek)" style="height: 22px;" />
+                                                <input type="time" placeholder="Godzina podania" value="@_nowyPosilek.Date.ToShortTimeString()" 
+                                                @onchange="(args) => HandleDateConversion(args, _nowyPosilek)" style="height: 22px;" />
                                         </td>
                                     </tr>
                                 </tbody>

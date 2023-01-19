@@ -22,7 +22,8 @@
                 @foreach (HodowlaDTO item in Hodowle)
                 {
                     <div>
-                        <a class="card shadow m-2 p-2 cardContainer @(SelectedHodowla==item.Id?"selected":"")" style="height:100px; width:175px; text-decoration: none;" @onclick="()=>LoadAnimals(item.Id)">
+                        <a class="card shadow m-2 p-2 cardContainer @(SelectedHodowla==item.Id?"selected":"")" 
+                        style="height:100px; width:175px; text-decoration: none;" @onclick="()=>LoadAnimals(item.Id)">
                             <div class="m-auto text-clipped">
                                 @item.Nazwa
                             </div>

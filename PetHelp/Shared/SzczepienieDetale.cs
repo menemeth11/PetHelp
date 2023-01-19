@@ -17,7 +17,7 @@ namespace PetHelp.Shared
                 {
                     ID = 1,
                     Name = "Szczepienie zasadnicze",
-                    Description = "PArowkoza, nosowka itp",
+                    Description = "Parwowiroza, nosowka itp",
                     IntervalArr = new int[5] { 49, 21, 21, 365, 1095 }
                 },
                 new SzczepienieInfo()
@@ -66,23 +66,29 @@ namespace PetHelp.Shared
             return new SzczepienieDTO(szczepienie.ID, dataNastepnegoSzczepienia);
 
         }
-    
-    
-        public static List<SzczepienieDTO> GetMergedSzczepieniaListWithFiveNext(int number, DateTime dataUrodzenia, List<SzczepienieDTO> zarejestrowaneSzczepienia, int zwierzeId)
+
+
+        public static List<SzczepienieDTO> GetMergedSzczepeniaMultipleNext(int number, DateTime dataUrodzenia, List<SzczepienieDTO> zarejestrowaneSzczepienia, int zwierzeId, List<SzczepienieInfo> szczepieniaSettingsData = null)
         {
+            if (szczepieniaSettingsData == null)
+            {
+                szczepieniaSettingsData = Szczepienia();
+            }
+
             List<SzczepienieDTO> polaczonaListaSzczepien = new();
-            foreach (var rodzaj in Szczepienia())
+            foreach (var rodzaj in szczepieniaSettingsData)
             {
                 int odbyteliczba = zarejestrowaneSzczepienia.Count(x => x.SzczepienieType == rodzaj.ID);
                 for (var i = 0; i < number; i++)
                 {
-                    polaczonaListaSzczepien.Add(SzczepienieDetale.GetNext(rodzaj, odbyteliczba++, dataUrodzenia));
+                    polaczonaListaSzczepien.Add(SzczepienieDetale.GetNext(rodzaj, odbyteliczba, dataUrodzenia));
+                    odbyteliczba++;
                 }
             }
             polaczonaListaSzczepien = polaczonaListaSzczepien.OrderBy(x => x.Data).Take(number).ToList();
             polaczonaListaSzczepien.AddRange(zarejestrowaneSzczepienia);
             polaczonaListaSzczepien.ForEach(x => x.ZwierzeId = zwierzeId);
-            
+
             return polaczonaListaSzczepien.OrderBy(x => x.Data).ToList();
         }
     }

@@ -199,7 +199,7 @@
 
 <!-- bottom nav -->
 <div class="profile-bottomnav">
-    <input class="confirmButton" type="button" value="Dodaj" @onclick="test" />
+    <input class="confirmButton" type="button" value="Dodaj" @onclick="dodaj" />
 </div>
 
 
@@ -233,7 +233,7 @@
 
     public ZwierzeDTO nowyzwierzak { get; set; } = new();
 
-    public async Task test()
+    public async Task dodaj()
     {
         nowyzwierzak.WlascicielId = CurrentUserId;
         nowyzwierzak.HodowlaId = Convert.ToInt32(hodowlaID);
@@ -255,7 +255,7 @@
 
         _state.Zwierzeta.Add(newZwierz);
         _state.SelectedHodowlaId = nowyzwierzak.HodowlaId;
-        Navigation.NavigateTo("/home"); //??????
+        Navigation.NavigateTo("/home");
     }
 
     public string CurrentUserId { get; set; }

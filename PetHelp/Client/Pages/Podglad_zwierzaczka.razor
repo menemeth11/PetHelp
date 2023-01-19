@@ -405,7 +405,6 @@
     private bool EditMode { get; set; } = false;
     // allow us to store response from server (allow to clone orginal-unchaged zwierze data, storing as a json format) populated on page initialisation
     private string _source_Json { get; set; }
-    private string dupa = "";
     private long maxFileSize = 5 * 1024 * 1024;
     private Kalendarz? Kalendarz;
     private Przycisktabeliszczepien? TabelaSzczepien;
@@ -422,7 +421,6 @@
     IJSObjectReference? module { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        // initial api call to our server to obtain ZwierzDTO data existing in database under Key corresponded to ZwierzeId
         var respond = await KlientHTTP.GetAsync($"Home/GetZwierzakDetails/{ZwierzeId}");
         // ensure if api call answer with succes code ( 200 OK )
         if (respond.IsSuccessStatusCode)
@@ -481,7 +479,7 @@
             if(this.Kalendarz.ListaSzczepien.Any() == false)
             {
                 // init pierwsze zaladowanie danych do klaendarza dotyczacych szczepien, 
-                this.Kalendarz.SetListaSzczepien(SzczepienieDetale.GetMergedSzczepieniaListWithFiveNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien, zwierz.Id));
+                this.Kalendarz.SetListaSzczepien(SzczepienieDetale.GetMergedSzczepeniaMultipleNext(5, zwierz.DataUrodzenia, zwierz.Lista_Szczepien, zwierz.Id));
             }
         }
     }
